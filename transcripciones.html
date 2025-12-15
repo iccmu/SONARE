@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área Privada - Transcripciones de Documentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-screen {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .login-screen h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .login-screen input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .login-screen button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-screen button:hover {
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: none;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #1e3c72;
+        }
+
+        .controls {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .content {
+            display: flex;
+            gap: 20px;
+            padding: 30px;
+            min-height: calc(100vh - 300px);
+        }
+
+        .transcription-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .form-panel {
+            width: 500px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .document-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .document-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .document-card.active {
+            border-left-color: #28a745;
+            background: #e8f5e9;
+        }
+
+        .document-header {
+            margin-bottom: 20px;
+        }
+
+        .document-title h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .document-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .meta-item {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+            background: #667eea;
+            color: white;
+        }
+
+        .transcription-section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .transcription-text {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            line-height: 1.8;
+            font-size: 1.05em;
+            color: #2c3e50;
+            white-space: pre-wrap;
+            text-align: justify;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .paleographic-notes {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .paleographic-notes h4 {
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .paleographic-notes p {
+            color: #856404;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .observations {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .observations h4 {
+            color: #0c5460;
+            margin-bottom: 8px;
+        }
+
+        .observations p {
+            color: #0c5460;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-header h3 {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .no-results h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .form-info {
+            background: #e7f3ff;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+            font-size: 0.9em;
+            color: #0d47a1;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .form-panel {
+                width: 100%;
+                position: relative;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .transcription-text {
+                font-size: 0.95em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div id="loginScreen" class="login-screen">
+        <h2>🔒 Área Privada</h2>
+        <p style="color: #6c757d; margin-bottom: 20px;">Acceso a transcripciones completas</p>
+        <input type="password" id="passwordInput" placeholder="Contraseña" onkeypress="handleKeyPress(event)">
+        <button onclick="checkPassword()">Acceder</button>
+        <p id="errorMsg" style="color: #dc3545; margin-top: 10px; display: none;">Contraseña incorrecta</p>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div id="mainContainer" class="container">
+        <header>
+            <div>
+                <h1>📜 Transcripciones Completas</h1>
+                <p style="opacity: 0.9; margin-top: 5px;">Documentos manuscritos - Área Privada</p>
+            </div>
+            <div>
+                <a href="index.html" class="logout-btn" style="margin-right: 10px;">← Volver</a>
+                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar en transcripciones..." oninput="filterDocuments()">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterByType('all')">Todos</button>
+                <button class="filter-btn" onclick="filterByType('Partitura')">Partituras</button>
+                <button class="filter-btn" onclick="filterByType('Carta')">Cartas</button>
+                <button class="filter-btn" onclick="filterByType('Documento contable')">Contables</button>
+                <button class="filter-btn" onclick="filterByType('Libreto')">Libretos</button>
+                <button class="filter-btn" onclick="filterByType('Nombramiento')">Nombramientos</button>
+                <button class="filter-btn" onclick="filterByType('Pago')">Pagos</button>
+                <button class="filter-btn" onclick="filterByType('Estado')">Estados</button>
+                <button class="filter-btn" onclick="filterByType('Memorial (súplica)')">Memoriales</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="transcription-panel">
+                <div id="documentsContainer">
+                    <!-- Los documentos se cargarán aquí -->
+                </div>
+            </div>
+
+            <div class="form-panel">
+                <div class="form-header">
+                    <h3>📝 Extracción de Datos</h3>
+                    <p style="font-size: 0.9em; opacity: 0.9;">Selecciona un documento para comenzar</p>
+                </div>
+                <div class="form-info" id="formInfo">
+                    Selecciona un documento de la lista para comenzar a extraer los datos de la transcripción.
+                </div>
+                <form id="dataForm">
+                    <div class="form-group">
+                        <label for="tipo_documento">Tipo de documento *</label>
+                        <select id="tipo_documento" name="tipo_documento" required>
+                            <option value="">Seleccionar tipo...</option>
+                            <option value="Memorial (súplica)">Memorial (súplica)</option>
+                            <option value="Documento contable">Documento contable</option>
+                            <option value="Estado">Estado</option>
+                            <option value="Partitura">Partitura</option>
+                            <option value="Carta">Carta</option>
+                            <option value="Libreto">Libreto</option>
+                            <option value="Prensa">Prensa</option>
+                            <option value="Protocolo">Protocolo</option>
+                            <option value="Ley">Ley</option>
+                            <option value="Decreto">Decreto</option>
+                            <option value="Nombramiento">Nombramiento</option>
+                            <option value="Pago">Pago</option>
+                            <option value="Cuenta">Cuenta</option>
+                            <option value="Anuncio">Anuncio</option>
+                            <option value="Aviso">Aviso</option>
+                            <option value="Descripción">Descripción</option>
+                            <option value="Informe">Informe</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha_inicio">Fecha inicio</label>
+                        <input type="date" id="fecha_inicio" name="fecha_inicio">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha_fin">Fecha fin</label>
+                        <input type="date" id="fecha_fin" name="fecha_fin">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lugar">Lugar</label>
+                        <input type="text" id="lugar" name="lugar" placeholder="Ej: Madrid, Sevilla...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observaciones_lugar">Observaciones lugar</label>
+                        <textarea id="observaciones_lugar" name="observaciones_lugar" placeholder="Observaciones sobre el lugar..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="texto">Texto</label>
+                        <textarea id="texto" name="texto" placeholder="Resumen o texto extraído..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emisor">Emisor</label>
+                        <input type="text" id="emisor" name="emisor" placeholder="Nombre de la persona o institución">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="destinatario">Destinatario</label>
+                        <input type="text" id="destinatario" name="destinatario" placeholder="Nombre de la persona o institución">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seccion_administrativa">Sección administrativa</label>
+                        <input type="text" id="seccion_administrativa" name="seccion_administrativa" placeholder="Ej: Real Capilla, Catedral...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="otras_personas">Otras personas</label>
+                        <textarea id="otras_personas" name="otras_personas" placeholder="Lista de otras personas mencionadas (separadas por comas)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="evento">Evento</label>
+                        <input type="text" id="evento" name="evento" placeholder="Tipo de evento relacionado">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="obra_musical">Obra musical</label>
+                        <input type="text" id="obra_musical" name="obra_musical" placeholder="Título de la obra musical">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signatura">Signatura</label>
+                        <input type="text" id="signatura" name="signatura" placeholder="Código de archivo">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="practica_musical">Práctica musical</label>
+                        <input type="text" id="practica_musical" name="practica_musical" placeholder="Ej: Misa, Concierto, Ópera...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="objeto_musical">Objeto musical</label>
+                        <input type="text" id="objeto_musical" name="objeto_musical" placeholder="Ej: Violín, Partitura, Órgano...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="autor">Autor</label>
+                        <input type="text" id="autor" name="autor" placeholder="Autor de la ficha o documento">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">Limpiar</button>
+                        <button type="button" class="btn btn-success" onclick="saveData()">Guardar</button>
+                        <button type="button" class="btn btn-primary" onclick="exportData()">Exportar JSON</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let transcripciones = [];
+        let documentos = [];
+        let personas = [];
+        let obras = [];
+        let eventos = [];
+        let objetos = [];
+        let currentFilter = 'all';
+        let searchTerm = '';
+        let currentDocumentId = null;
+        let savedData = {};
+
+        // Contraseña simple (en producción usar autenticación real)
+        const PASSWORD = 'transcripciones2024';
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        }
+
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+                loadData();
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        async function loadData() {
+            try {
+                const [transRes, docRes, perRes, obrRes, evRes, objRes] = await Promise.all([
+                    fetch('transcripciones.json'),
+                    fetch('documentos.json'),
+                    fetch('personas.json'),
+                    fetch('obras_musicales.json'),
+                    fetch('eventos.json'),
+                    fetch('objetos_musicales.json')
+                ]);
+
+                transcripciones = await transRes.json();
+                documentos = await docRes.json();
+                personas = await perRes.json();
+                obras = await obrRes.json();
+                eventos = await evRes.json();
+                objetos = await objRes.json();
+
+                // Cargar datos guardados
+                const saved = localStorage.getItem('extractedData');
+                if (saved) {
+                    savedData = JSON.parse(saved);
+                }
+
+                // Verificar si hay parámetros de URL para filtrar
+                const urlParams = new URLSearchParams(window.location.search);
+                const docsParam = urlParams.get('docs');
+                
+                renderDocuments();
+                
+                // Si hay documentos en la URL, seleccionar el primero automáticamente después de renderizar
+                if (docsParam) {
+                    const firstDocId = docsParam.split(',')[0].trim();
+                    setTimeout(() => {
+                        // Llamar directamente a selectDocument
+                        const doc = documentos.find(d => d.id === firstDocId);
+                        if (doc) {
+                            currentDocumentId = firstDocId;
+                            // Marcar como activo
+                            const firstCard = document.querySelector(`[onclick*="selectDocument('${firstDocId}')"]`);
+                            if (firstCard) {
+                                firstCard.classList.add('active');
+                            }
+                            loadFormData(doc);
+                            document.getElementById('formInfo').innerHTML = 
+                                `<strong>Documento seleccionado:</strong> ${firstDocId}<br>Filtrado por evento. Extrae los datos de la transcripción.`;
+                        }
+                    }, 500);
+                }
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                document.getElementById('documentsContainer').innerHTML = 
+                    '<div class="no-results"><h3>Error cargando datos</h3><p>Por favor, asegúrate de que los archivos JSON estén disponibles.</p></div>';
+            }
+        }
+
+        function filterByType(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderDocuments();
+        }
+
+        function filterDocuments() {
+            searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            renderDocuments();
+        }
+
+        function selectDocument(docId) {
+            currentDocumentId = docId;
+            
+            // Actualizar clases activas
+            document.querySelectorAll('.document-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.currentTarget.closest('.document-card').classList.add('active');
+
+            // Cargar datos guardados si existen
+            const saved = savedData[docId];
+            if (saved) {
+                loadFormData(saved);
+                document.getElementById('formInfo').innerHTML = 
+                    `<strong>Documento seleccionado:</strong> ${docId}<br>Datos guardados previamente. Puedes editarlos.`;
+            } else {
+                // Cargar datos del documento original
+                const doc = documentos.find(d => d.id === docId);
+                if (doc) {
+                    loadFormData(doc);
+                    document.getElementById('formInfo').innerHTML = 
+                        `<strong>Documento seleccionado:</strong> ${docId}<br>Extrae los datos de la transcripción y complétalos aquí.`;
+                }
+            }
+        }
+
+        function loadFormData(data) {
+            document.getElementById('tipo_documento').value = data.tipo_documento || '';
+            document.getElementById('fecha_inicio').value = data.fecha_inicio || '';
+            document.getElementById('fecha_fin').value = data.fecha_fin || '';
+            document.getElementById('lugar').value = data.lugar || '';
+            document.getElementById('observaciones_lugar').value = data.observaciones_lugar || '';
+            document.getElementById('texto').value = data.texto || '';
+            document.getElementById('emisor').value = data.emisor_id ? getPersonaName(data.emisor_id) : '';
+            document.getElementById('destinatario').value = data.destinatario_id ? getPersonaName(data.destinatario_id) : '';
+            document.getElementById('seccion_administrativa').value = data.seccion_administrativa || '';
+            document.getElementById('otras_personas').value = data.otras_personas_ids ? 
+                data.otras_personas_ids.map(id => getPersonaName(id)).join(', ') : '';
+            document.getElementById('evento').value = data.evento_id ? getEventoName(data.evento_id) : '';
+            document.getElementById('obra_musical').value = data.obra_musical_id ? getObraName(data.obra_musical_id) : '';
+            document.getElementById('signatura').value = data.signatura || '';
+            document.getElementById('practica_musical').value = data.practica_musical || '';
+            document.getElementById('objeto_musical').value = data.objeto_musical_id ? getObjetoName(data.objeto_musical_id) : '';
+            document.getElementById('autor').value = data.autor || '';
+        }
+
+        function getPersonaName(id) {
+            const p = personas.find(per => per.id === id);
+            return p ? `${p.nombre_uniforme} ${p.apellidos_uniforme}` : id;
+        }
+
+        function getEventoName(id) {
+            const e = eventos.find(ev => ev.id === id);
+            return e ? `${e.tipo_evento} - ${e.celebracion}` : id;
+        }
+
+        function getObraName(id) {
+            const o = obras.find(ob => ob.id === id);
+            return o ? o.titulo_uniforme : id;
+        }
+
+        function getObjetoName(id) {
+            const obj = objetos.find(o => o.id === id);
+            return obj ? obj.tipo_objeto : id;
+        }
+
+        function clearForm() {
+            document.getElementById('dataForm').reset();
+            document.getElementById('formInfo').innerHTML = 
+                'Formulario limpiado. Selecciona un documento para comenzar.';
+            currentDocumentId = null;
+            document.querySelectorAll('.document-card').forEach(card => {
+                card.classList.remove('active');
+            });
+        }
+
+        function saveData() {
+            if (!currentDocumentId) {
+                alert('Por favor, selecciona un documento primero.');
+                return;
+            }
+
+            const formData = {
+                tipo_documento: document.getElementById('tipo_documento').value,
+                fecha_inicio: document.getElementById('fecha_inicio').value,
+                fecha_fin: document.getElementById('fecha_fin').value,
+                lugar: document.getElementById('lugar').value,
+                observaciones_lugar: document.getElementById('observaciones_lugar').value,
+                texto: document.getElementById('texto').value,
+                emisor: document.getElementById('emisor').value,
+                destinatario: document.getElementById('destinatario').value,
+                seccion_administrativa: document.getElementById('seccion_administrativa').value,
+                otras_personas: document.getElementById('otras_personas').value,
+                evento: document.getElementById('evento').value,
+                obra_musical: document.getElementById('obra_musical').value,
+                signatura: document.getElementById('signatura').value,
+                practica_musical: document.getElementById('practica_musical').value,
+                objeto_musical: document.getElementById('objeto_musical').value,
+                autor: document.getElementById('autor').value
+            };
+
+            savedData[currentDocumentId] = formData;
+            localStorage.setItem('extractedData', JSON.stringify(savedData));
+
+            alert('Datos guardados correctamente para ' + currentDocumentId);
+        }
+
+        function exportData() {
+            if (Object.keys(savedData).length === 0) {
+                alert('No hay datos guardados para exportar.');
+                return;
+            }
+
+            const dataStr = JSON.stringify(savedData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'datos_extraidos_' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function renderDocuments() {
+            // Obtener parámetros de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const docsParam = urlParams.get('docs');
+            let filteredDocIds = null;
+            
+            if (docsParam) {
+                filteredDocIds = docsParam.split(',').map(id => id.trim());
+                // Mostrar mensaje informativo
+                document.getElementById('formInfo').innerHTML = 
+                    `<strong>Filtrado por evento:</strong> Mostrando ${filteredDocIds.length} documento(s) relacionado(s).<br>Puedes consultar y editar las transcripciones aquí.`;
+            }
+
+            let filtered = transcripciones.filter(trans => {
+                const doc = documentos.find(d => d.id === trans.documento_id);
+                if (!doc) return false;
+
+                // Filtro por documentos de la URL (si existe)
+                if (filteredDocIds && !filteredDocIds.includes(trans.documento_id)) {
+                    return false;
+                }
+
+                // Filtro por tipo
+                if (currentFilter !== 'all' && doc.tipo_documento !== currentFilter) {
+                    return false;
+                }
+
+                // Filtro por búsqueda
+                if (searchTerm) {
+                    const searchIn = (
+                        trans.transcripcion_completa.toLowerCase() +
+                        trans.notas_paleograficas.toLowerCase() +
+                        trans.observaciones.toLowerCase() +
+                        doc.signatura.toLowerCase() +
+                        doc.texto.toLowerCase()
+                    );
+                    if (!searchIn.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                document.getElementById('documentsContainer').innerHTML = 
+                    '<div class="no-results"><h3>No se encontraron documentos</h3><p>Intenta ajustar los filtros o la búsqueda.</p></div>';
+                return;
+            }
+
+            const html = filtered.map(trans => {
+                const doc = documentos.find(d => d.id === trans.documento_id);
+                if (!doc) return '';
+
+                const hasSavedData = savedData[doc.id] ? ' (Guardado)' : '';
+
+                return `
+                    <div class="document-card" onclick="selectDocument('${doc.id}')">
+                        <div class="document-header">
+                            <div class="document-title">
+                                <h2>${doc.tipo_documento}${hasSavedData}</h2>
+                                <div class="document-meta">
+                                    <div class="meta-item">
+                                        <strong>Signatura:</strong> ${trans.signatura}
+                                    </div>
+                                    <div class="meta-item">
+                                        <strong>Fecha:</strong> ${doc.fecha_inicio}
+                                    </div>
+                                    <div class="meta-item">
+                                        <strong>Lugar:</strong> ${doc.lugar}
+                                    </div>
+                                    <span class="badge">${doc.tipo_documento}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="transcription-section">
+                            <div class="section-title">📄 Transcripción Completa</div>
+                            <div class="transcription-text">${highlightSearch(trans.transcripcion_completa)}</div>
+                        </div>
+
+                        <div class="paleographic-notes">
+                            <h4>🔍 Notas Paleográficas</h4>
+                            <p>${highlightSearch(trans.notas_paleograficas)}</p>
+                        </div>
+
+                        <div class="observations">
+                            <h4>📝 Observaciones</h4>
+                            <p>${highlightSearch(trans.observaciones)}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('documentsContainer').innerHTML = html;
+        }
+
+        function highlightSearch(text) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<mark style="background: #ffeb3b; padding: 2px 4px;">$1</mark>');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "OBR001",
+    "titulo_uniforme": "Misa en Re Mayor",
+    "otras_formas_titulo": "Missa in D, Misa en Re",
+    "compositor_id": "PER001",
+    "libretista_id": null,
+    "otras_personas_ids": ["PER002", "PER003"],
+    "documentos_ids": ["DOC001", "DOC006"],
+    "genero_musical": "Misa",
+    "fecha": "1785",
+    "evento_id": "EVE001",
+    "practica_musical": "Misa solemne"
+  },
+  {
+    "id": "OBR002",
+    "titulo_uniforme": "La Dama Duende",
+    "otras_formas_titulo": "La Dama Duende, ópera cómica",
+    "compositor_id": "PER010",
+    "libretista_id": "PER009",
+    "otras_personas_ids": ["PER011"],
+    "documentos_ids": ["DOC004"],
+    "genero_musical": "Ópera",
+    "fecha": "1792",
+    "evento_id": "EVE002",
+    "practica_musical": "Ópera"
+  },
+  {
+    "id": "OBR003",
+    "titulo_uniforme": "Salve Regina",
+    "otras_formas_titulo": "Salve Regina en Fa menor",
+    "compositor_id": "PER004",
+    "libretista_id": null,
+    "otras_personas_ids": [],
+    "documentos_ids": [],
+    "genero_musical": "Música religiosa",
+    "fecha": "1790",
+    "evento_id": null,
+    "practica_musical": "Ceremonia religiosa"
+  }
+]
+

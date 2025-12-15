@@ -1,0 +1,14 @@
+Orden,Campos,Tipo de campo (Tesauro/Libre),Tesauro,Tareas,Observaciones
+,Nombre uniforme,,,,
+,Apellidos uniforme,,,,
+,Otras formas del nombre,,,,
+,Título (nobiliario),,,,
+,ID VIAFF?,,,,
+,Género M/F,T,,,
+,Fecha nacimiento,T,,,
+,Fecha muerte,T,,,
+,Función,T,,,"músico, no músico, función concreta"
+,Cargo profesonal,,,,
+,Documentos,Relaciones,,,
+,Eventos,Relaciones,,,
+,Obras,Relaciones,,,

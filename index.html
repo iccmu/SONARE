@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos - Documentos Musicales Históricos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .private-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid white;
+            transition: all 0.3s;
+        }
+
+        .private-link:hover {
+            background: white;
+            color: #2c3e50;
+        }
+
+        .filters {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .filters h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .hierarchical-select {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .hierarchical-select select {
+            flex: 1;
+        }
+
+        .hierarchical-select .separator {
+            color: #6c757d;
+            font-weight: bold;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9em;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .badge-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .relation-link {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .relation-link:hover {
+            color: #764ba2;
+        }
+
+        .text-truncate {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .doc-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .doc-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .documents-cell {
+            max-width: 300px;
+        }
+
+        .edit-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .edit-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border: none;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-header h2 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .modal-form-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
+        .modal-form-group input,
+        .modal-form-group select,
+        .modal-form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .modal-form-group input:focus,
+        .modal-form-group select:focus,
+        .modal-form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .no-results h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .clear-filters {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .clear-filters:hover {
+            background: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="transcripciones.html" class="private-link">🔒 Transcripciones</a>
+            <h1>📜 Base de Datos de Documentos Musicales Históricos</h1>
+            <p>Archivo de documentos manuscritos del siglo XVIII</p>
+        </header>
+
+        <div class="filters">
+            <h2>🔍 Filtros de Búsqueda</h2>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Persona (Autor, Receptor, Citada)</label>
+                    <select id="filter-persona">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Lugar (Jerárquico)</label>
+                    <div class="hierarchical-select">
+                        <select id="filter-lugar-ciudad">
+                            <option value="">Todas las ciudades</option>
+                        </select>
+                        <span class="separator">></span>
+                        <select id="filter-lugar-edificio">
+                            <option value="">Todos los edificios</option>
+                        </select>
+                        <span class="separator">></span>
+                        <select id="filter-lugar-sala">
+                            <option value="">Todas las salas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>Obra (Título)</label>
+                    <select id="filter-obra">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Tipo de Evento</label>
+                    <select id="filter-tipo-evento">
+                        <option value="">Todos</option>
+                        <option value="Ensayo">Ensayo</option>
+                        <option value="Concierto">Concierto</option>
+                        <option value="Ceremonia religiosa">Ceremonia religiosa</option>
+                        <option value="Representación teatral">Representación teatral</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Fecha Inicio (desde)</label>
+                    <input type="date" id="filter-fecha-desde">
+                </div>
+                <div class="filter-group">
+                    <label>Fecha Fin (hasta)</label>
+                    <input type="date" id="filter-fecha-hasta">
+                </div>
+                <div class="filter-group">
+                    <label>Celebración</label>
+                    <select id="filter-celebracion">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+            </div>
+            <button class="clear-filters" onclick="clearFilters()">Limpiar Filtros</button>
+            <div class="stats">
+                <div class="stat-card">
+                    <h3 id="stat-total-label">Total Eventos</h3>
+                    <div class="number" id="stat-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-filtered-label">Eventos Filtrados</h3>
+                    <div class="number" id="stat-filtered">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('eventos')">Eventos</button>
+                <button class="tab" onclick="showTab('documentos')">Documentos</button>
+                <button class="tab" onclick="showTab('personas')">Personas</button>
+                <button class="tab" onclick="showTab('obras')">Obras Musicales</button>
+                <button class="tab" onclick="showTab('objetos')">Objetos Musicales</button>
+            </div>
+
+            <div id="tab-content">
+                <!-- El contenido se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let documentos = [];
+        let personas = [];
+        let obras = [];
+        let eventos = [];
+        let objetos = [];
+        let currentTab = 'eventos';
+
+        // Cargar datos JSON
+        async function loadData() {
+            try {
+                const [docRes, perRes, obrRes, evRes, objRes] = await Promise.all([
+                    fetch('documentos.json'),
+                    fetch('personas.json'),
+                    fetch('obras_musicales.json'),
+                    fetch('eventos.json'),
+                    fetch('objetos_musicales.json')
+                ]);
+
+                documentos = await docRes.json();
+                personas = await perRes.json();
+                obras = await obrRes.json();
+                eventos = await evRes.json();
+                objetos = await objRes.json();
+
+                initializeFilters();
+                renderTable('eventos');
+                updateStats(eventos.length, 'eventos');
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                document.getElementById('tab-content').innerHTML = 
+                    '<div class="no-results"><h3>Error cargando datos</h3><p>Por favor, asegúrate de que los archivos JSON estén disponibles.</p></div>';
+            }
+        }
+
+        function initializeFilters() {
+            // Personas (autor, receptor, citadas)
+            const allPersonIds = new Set();
+            documentos.forEach(doc => {
+                if (doc.emisor_id) allPersonIds.add(doc.emisor_id);
+                if (doc.destinatario_id) allPersonIds.add(doc.destinatario_id);
+                if (doc.otras_personas_ids) {
+                    doc.otras_personas_ids.forEach(id => allPersonIds.add(id));
+                }
+            });
+            
+            Array.from(allPersonIds).sort().forEach(personId => {
+                const persona = personas.find(p => p.id === personId);
+                if (persona) {
+                    const option = document.createElement('option');
+                    option.value = personId;
+                    option.textContent = `${persona.nombre_uniforme} ${persona.apellidos_uniforme}`;
+                    document.getElementById('filter-persona').appendChild(option);
+                }
+            });
+
+            // Sistema jerárquico de lugares
+            const lugaresHierarchy = {};
+            [...documentos.map(d => d.lugar), ...eventos.map(e => e.lugar)].forEach(lugar => {
+                if (lugar && lugar.includes(' > ')) {
+                    const parts = lugar.split(' > ');
+                    if (parts.length >= 1) {
+                        const ciudad = parts[0];
+                        if (!lugaresHierarchy[ciudad]) lugaresHierarchy[ciudad] = {};
+                        if (parts.length >= 2) {
+                            const edificio = parts[1];
+                            if (!lugaresHierarchy[ciudad][edificio]) lugaresHierarchy[ciudad][edificio] = [];
+                            if (parts.length >= 3) {
+                                lugaresHierarchy[ciudad][edificio].push(parts[2]);
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Llenar ciudades
+            Object.keys(lugaresHierarchy).sort().forEach(ciudad => {
+                const option = document.createElement('option');
+                option.value = ciudad;
+                option.textContent = ciudad;
+                document.getElementById('filter-lugar-ciudad').appendChild(option);
+            });
+
+            // Obras
+            obras.forEach(obra => {
+                const option = document.createElement('option');
+                option.value = obra.id;
+                option.textContent = obra.titulo_uniforme;
+                document.getElementById('filter-obra').appendChild(option);
+            });
+
+            // Celebraciones
+            const celebraciones = [...new Set(eventos.map(e => e.celebracion).filter(c => c))].sort();
+            celebraciones.forEach(celebracion => {
+                const option = document.createElement('option');
+                option.value = celebracion;
+                option.textContent = celebracion;
+                document.getElementById('filter-celebracion').appendChild(option);
+            });
+
+            // Event listeners
+            document.getElementById('filter-persona').addEventListener('change', applyFilters);
+            document.getElementById('filter-lugar-ciudad').addEventListener('change', updateLugarFilters);
+            document.getElementById('filter-lugar-edificio').addEventListener('change', function() {
+                const ciudad = document.getElementById('filter-lugar-ciudad').value;
+                const edificio = this.value;
+                const salaSelect = document.getElementById('filter-lugar-sala');
+                
+                // Limpiar y actualizar salas
+                salaSelect.innerHTML = '<option value="">Todas las salas</option>';
+                
+                if (ciudad && edificio && window.lugaresHierarchy && window.lugaresHierarchy[ciudad] && window.lugaresHierarchy[ciudad][edificio]) {
+                    window.lugaresHierarchy[ciudad][edificio].forEach(sala => {
+                        const option = document.createElement('option');
+                        option.value = sala;
+                        option.textContent = sala;
+                        salaSelect.appendChild(option);
+                    });
+                }
+                
+                applyFilters();
+            });
+            document.getElementById('filter-lugar-sala').addEventListener('change', applyFilters);
+            document.getElementById('filter-obra').addEventListener('change', applyFilters);
+            document.getElementById('filter-tipo-evento').addEventListener('change', applyFilters);
+            document.getElementById('filter-fecha-desde').addEventListener('change', applyFilters);
+            document.getElementById('filter-fecha-hasta').addEventListener('change', applyFilters);
+            document.getElementById('filter-celebracion').addEventListener('change', applyFilters);
+
+            // Guardar jerarquía para uso posterior
+            window.lugaresHierarchy = lugaresHierarchy;
+        }
+
+        function updateLugarFilters() {
+            const ciudad = document.getElementById('filter-lugar-ciudad').value;
+            const edificioSelect = document.getElementById('filter-lugar-edificio');
+            const salaSelect = document.getElementById('filter-lugar-sala');
+
+            // Limpiar selectores
+            edificioSelect.innerHTML = '<option value="">Todos los edificios</option>';
+            salaSelect.innerHTML = '<option value="">Todas las salas</option>';
+
+            if (ciudad && window.lugaresHierarchy && window.lugaresHierarchy[ciudad]) {
+                // Llenar edificios de la ciudad seleccionada
+                Object.keys(window.lugaresHierarchy[ciudad]).sort().forEach(edificio => {
+                    const option = document.createElement('option');
+                    option.value = edificio;
+                    option.textContent = edificio;
+                    edificioSelect.appendChild(option);
+                });
+
+                // Si hay un edificio ya seleccionado, mantenerlo y actualizar salas
+                const edificioActual = edificioSelect.value;
+                if (edificioActual && window.lugaresHierarchy[ciudad][edificioActual]) {
+                    window.lugaresHierarchy[ciudad][edificioActual].forEach(sala => {
+                        const option = document.createElement('option');
+                        option.value = sala;
+                        option.textContent = sala;
+                        salaSelect.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        function applyFilters() {
+            const persona = document.getElementById('filter-persona').value;
+            const ciudad = document.getElementById('filter-lugar-ciudad').value;
+            const edificio = document.getElementById('filter-lugar-edificio').value;
+            const sala = document.getElementById('filter-lugar-sala').value;
+            const obra = document.getElementById('filter-obra').value;
+            const tipoEvento = document.getElementById('filter-tipo-evento').value;
+            const fechaDesde = document.getElementById('filter-fecha-desde').value;
+            const fechaHasta = document.getElementById('filter-fecha-hasta').value;
+            const celebracion = document.getElementById('filter-celebracion').value;
+
+            if (currentTab === 'eventos') {
+                // Filtrar eventos
+                let filtered = eventos.filter(evento => {
+                    // Filtro por persona (participantes del evento)
+                    if (persona) {
+                        if (!evento.personas_ids || !evento.personas_ids.includes(persona)) {
+                            return false;
+                        }
+                    }
+
+                    // Filtro por lugar jerárquico
+                    if (ciudad || edificio || sala) {
+                        const eventoLugar = evento.lugar || '';
+                        const lugarParts = eventoLugar.split(' > ');
+                        
+                        if (ciudad && lugarParts[0] !== ciudad) return false;
+                        if (edificio && lugarParts[1] !== edificio) return false;
+                        if (sala && lugarParts[2] !== sala) return false;
+                    }
+
+                    // Filtro por obra
+                    if (obra && evento.obra_id !== obra) return false;
+
+                    // Filtro por tipo de evento
+                    if (tipoEvento && evento.tipo_evento !== tipoEvento) return false;
+
+                    // Filtro por fechas
+                    if (fechaDesde && evento.fecha_inicio < fechaDesde) return false;
+                    if (fechaHasta && evento.fecha_fin > fechaHasta) return false;
+
+                    // Filtro por celebración
+                    if (celebracion && evento.celebracion !== celebracion) return false;
+
+                    return true;
+                });
+
+                updateStats(filtered.length, 'eventos');
+                renderFilteredTable(filtered);
+            } else {
+                // Filtrar documentos
+                let filtered = documentos.filter(doc => {
+                    // Filtro por persona (autor, receptor, citada)
+                    if (persona) {
+                        const matchesPersona = 
+                            doc.emisor_id === persona ||
+                            doc.destinatario_id === persona ||
+                            (doc.otras_personas_ids && doc.otras_personas_ids.includes(persona));
+                        if (!matchesPersona) return false;
+                    }
+
+                    // Filtro por lugar jerárquico
+                    if (ciudad || edificio || sala) {
+                        const docLugar = doc.lugar || '';
+                        const lugarParts = docLugar.split(' > ');
+                        
+                        if (ciudad && lugarParts[0] !== ciudad) return false;
+                        if (edificio && lugarParts[1] !== edificio) return false;
+                        if (sala && lugarParts[2] !== sala) return false;
+                    }
+
+                    // Filtro por obra
+                    if (obra && doc.obra_musical_id !== obra) return false;
+
+                    // Filtro por tipo de evento (a través del evento relacionado)
+                    if (tipoEvento) {
+                        const evento = eventos.find(e => e.id === doc.evento_id);
+                        if (!evento || evento.tipo_evento !== tipoEvento) return false;
+                    }
+
+                    // Filtro por fechas
+                    if (fechaDesde && doc.fecha_inicio < fechaDesde) return false;
+                    if (fechaHasta && doc.fecha_fin > fechaHasta) return false;
+
+                    // Filtro por celebración (a través del evento relacionado)
+                    if (celebracion) {
+                        const evento = eventos.find(e => e.id === doc.evento_id);
+                        if (!evento || evento.celebracion !== celebracion) return false;
+                    }
+
+                    return true;
+                });
+
+                updateStats(filtered.length, 'documentos');
+                renderFilteredTable(filtered);
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-persona').value = '';
+            document.getElementById('filter-lugar-ciudad').value = '';
+            document.getElementById('filter-lugar-edificio').value = '';
+            document.getElementById('filter-lugar-sala').value = '';
+            document.getElementById('filter-obra').value = '';
+            document.getElementById('filter-tipo-evento').value = '';
+            document.getElementById('filter-fecha-desde').value = '';
+            document.getElementById('filter-fecha-hasta').value = '';
+            document.getElementById('filter-celebracion').value = '';
+            
+            // Resetear los selectores jerárquicos
+            document.getElementById('filter-lugar-edificio').innerHTML = '<option value="">Todos los edificios</option>';
+            document.getElementById('filter-lugar-sala').innerHTML = '<option value="">Todas las salas</option>';
+            
+            applyFilters();
+        }
+
+        function updateStats(filtered, tab = currentTab) {
+            if (tab === 'eventos') {
+                document.getElementById('stat-total').textContent = eventos.length;
+                document.getElementById('stat-filtered').textContent = filtered;
+            } else {
+                document.getElementById('stat-total').textContent = documentos.length;
+                document.getElementById('stat-filtered').textContent = filtered;
+            }
+        }
+
+        function showTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Actualizar etiquetas de estadísticas
+            if (tabName === 'eventos') {
+                document.getElementById('stat-total-label').textContent = 'Total Eventos';
+                document.getElementById('stat-filtered-label').textContent = 'Eventos Filtrados';
+                updateStats(eventos.length, 'eventos');
+            } else if (tabName === 'documentos') {
+                document.getElementById('stat-total-label').textContent = 'Total Documentos';
+                document.getElementById('stat-filtered-label').textContent = 'Documentos Filtrados';
+                updateStats(documentos.length, 'documentos');
+            } else {
+                document.getElementById('stat-total-label').textContent = 'Total';
+                document.getElementById('stat-filtered-label').textContent = 'Filtrados';
+            }
+            
+            renderTable(tabName);
+            applyFilters(); // Reaplicar filtros al cambiar de pestaña
+        }
+
+        function renderTable(tabName) {
+            switch(tabName) {
+                case 'eventos':
+                    renderEventosTable(eventos);
+                    break;
+                case 'documentos':
+                    renderDocumentosTable(documentos);
+                    break;
+                case 'personas':
+                    renderPersonasTable(personas);
+                    break;
+                case 'obras':
+                    renderObrasTable(obras);
+                    break;
+                case 'objetos':
+                    renderObjetosTable(objetos);
+                    break;
+            }
+        }
+
+        function renderFilteredTable(filtered) {
+            if (currentTab === 'eventos') {
+                renderEventosTable(filtered);
+            } else if (currentTab === 'documentos') {
+                renderDocumentosTable(filtered);
+            }
+        }
+
+        function renderDocumentosTable(data) {
+            if (data.length === 0) {
+                document.getElementById('tab-content').innerHTML = 
+                    '<div class="no-results"><h3>No se encontraron documentos</h3><p>Intenta ajustar los filtros.</p></div>';
+                return;
+            }
+
+            // Verificar si hay filtro de persona activo
+            const personaFiltro = document.getElementById('filter-persona').value;
+            const showRol = personaFiltro !== '';
+
+            const html = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Fecha</th>
+                                <th>Lugar</th>
+                                <th>Emisor</th>
+                                <th>Destinatario</th>
+                                ${showRol ? '<th>Rol de la Persona</th>' : ''}
+                                <th>Obra</th>
+                                <th>Signatura</th>
+                                <th>Texto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(doc => {
+                                const emisor = personas.find(p => p.id === doc.emisor_id);
+                                const destinatario = personas.find(p => p.id === doc.destinatario_id);
+                                const obra = obras.find(o => o.id === doc.obra_musical_id);
+                                
+                                // Determinar el rol de la persona filtrada
+                                let rolBadge = '';
+                                if (showRol) {
+                                    const roles = [];
+                                    if (doc.emisor_id === personaFiltro) {
+                                        roles.push('<span class="badge badge-success">Emisor</span>');
+                                    }
+                                    if (doc.destinatario_id === personaFiltro) {
+                                        roles.push('<span class="badge badge-info">Receptor</span>');
+                                    }
+                                    if (doc.otras_personas_ids && doc.otras_personas_ids.includes(personaFiltro)) {
+                                        roles.push('<span class="badge badge-warning">Persona citada</span>');
+                                    }
+                                    rolBadge = roles.length > 0 ? roles.join(' ') : '-';
+                                }
+
+                                return `
+                                    <tr>
+                                        <td><strong>${doc.id}</strong></td>
+                                        <td><span class="badge badge-primary">${doc.tipo_documento}</span></td>
+                                        <td>${doc.fecha_inicio}</td>
+                                        <td>${doc.lugar}</td>
+                                        <td>${emisor ? `${emisor.nombre_uniforme} ${emisor.apellidos_uniforme}` : doc.emisor_id}</td>
+                                        <td>${destinatario ? `${destinatario.nombre_uniforme} ${destinatario.apellidos_uniforme}` : doc.destinatario_id}</td>
+                                        ${showRol ? `<td>${rolBadge}</td>` : ''}
+                                        <td>${obra ? obra.titulo_uniforme : '-'}</td>
+                                        <td>${doc.signatura}</td>
+                                        <td class="text-truncate" title="${doc.texto}">${doc.texto}</td>
+                                        <td><button class="edit-btn" onclick="openEditModal('documento', '${doc.id}')">✏️ Editar</button></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('tab-content').innerHTML = html;
+        }
+
+        function renderPersonasTable(data) {
+            const html = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Género</th>
+                                <th>Función</th>
+                                <th>Cargo</th>
+                                <th>Fechas</th>
+                                <th>Documentos</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(per => `
+                                <tr>
+                                    <td><strong>${per.id}</strong></td>
+                                    <td>${per.nombre_uniforme}</td>
+                                    <td>${per.apellidos_uniforme}</td>
+                                    <td>${per.genero || '-'}</td>
+                                    <td><span class="badge ${per.funcion === 'músico' ? 'badge-success' : 'badge-info'}">${per.funcion || '-'}</span></td>
+                                    <td>${per.cargo_profesional || '-'}</td>
+                                    <td>${per.fecha_nacimiento || '?'} - ${per.fecha_muerte || '?'}</td>
+                                    <td>${per.documentos_ids ? per.documentos_ids.length : 0}</td>
+                                    <td><button class="edit-btn" onclick="openEditModal('persona', '${per.id}')">✏️ Editar</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('tab-content').innerHTML = html;
+        }
+
+        function renderObrasTable(data) {
+            const html = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título Uniforme</th>
+                                <th>Compositor</th>
+                                <th>Libretista</th>
+                                <th>Género</th>
+                                <th>Fecha</th>
+                                <th>Documentos</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(obra => {
+                                const compositor = personas.find(p => p.id === obra.compositor_id);
+                                const libretista = personas.find(p => p.id === obra.libretista_id);
+                                return `
+                                    <tr>
+                                        <td><strong>${obra.id}</strong></td>
+                                        <td><strong>${obra.titulo_uniforme}</strong></td>
+                                        <td>${compositor ? `${compositor.nombre_uniforme} ${compositor.apellidos_uniforme}` : '-'}</td>
+                                        <td>${libretista ? `${libretista.nombre_uniforme} ${libretista.apellidos_uniforme}` : '-'}</td>
+                                        <td><span class="badge badge-warning">${obra.genero_musical || '-'}</span></td>
+                                        <td>${obra.fecha || '-'}</td>
+                                        <td>${obra.documentos_ids ? obra.documentos_ids.length : 0}</td>
+                                        <td><button class="edit-btn" onclick="openEditModal('obra', '${obra.id}')">✏️ Editar</button></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('tab-content').innerHTML = html;
+        }
+
+        function renderEventosTable(data) {
+            if (data.length === 0) {
+                document.getElementById('tab-content').innerHTML = 
+                    '<div class="no-results"><h3>No se encontraron eventos</h3><p>Intenta ajustar los filtros.</p></div>';
+                return;
+            }
+
+            // Verificar si hay filtro de persona activo
+            const personaFiltro = document.getElementById('filter-persona').value;
+            const showRol = personaFiltro !== '';
+
+            const html = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Lugar</th>
+                                <th>Fecha</th>
+                                <th>Celebración</th>
+                                <th>Obra</th>
+                                <th>Personas</th>
+                                ${showRol ? '<th>Rol de la Persona</th>' : ''}
+                                <th>Documentos de Origen</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(eve => {
+                                const obra = obras.find(o => o.id === eve.obra_id);
+                                
+                                // Determinar si la persona filtrada participa en el evento
+                                let rolBadge = '';
+                                if (showRol) {
+                                    if (eve.personas_ids && eve.personas_ids.includes(personaFiltro)) {
+                                        rolBadge = '<span class="badge badge-success">Participante</span>';
+                                    } else {
+                                        rolBadge = '-';
+                                    }
+                                }
+                                
+                                // Lista de personas participantes
+                                const personasList = eve.personas_ids ? eve.personas_ids.map(id => {
+                                    const p = personas.find(per => per.id === id);
+                                    return p ? `${p.nombre_uniforme} ${p.apellidos_uniforme}` : id;
+                                }).join(', ') : '-';
+
+                                // Generar links a documentos
+                                let documentosLinks = '-';
+                                if (eve.documentos_ids && eve.documentos_ids.length > 0) {
+                                    const docsParam = eve.documentos_ids.join(',');
+                                    documentosLinks = eve.documentos_ids.map(docId => {
+                                        const doc = documentos.find(d => d.id === docId);
+                                        const signatura = doc ? doc.signatura : docId;
+                                        const transcripcionesUrl = `transcripciones.html?docs=${docsParam}`;
+                                        return `<a href="${transcripcionesUrl}" target="_blank" rel="noopener noreferrer" class="doc-link" title="Ver transcripción de ${signatura}">${signatura}</a>`;
+                                    }).join(', ');
+                                }
+
+                                return `
+                                    <tr>
+                                        <td><strong>${eve.id}</strong></td>
+                                        <td><span class="badge badge-primary">${eve.tipo_evento}</span></td>
+                                        <td>${eve.lugar}</td>
+                                        <td>${eve.fecha_inicio}</td>
+                                        <td>${eve.celebracion || '-'}</td>
+                                        <td>${obra ? obra.titulo_uniforme : '-'}</td>
+                                        <td title="${personasList}">${eve.personas_ids ? eve.personas_ids.length : 0}</td>
+                                        ${showRol ? `<td>${rolBadge}</td>` : ''}
+                                        <td class="documents-cell">${documentosLinks}</td>
+                                        <td><button class="edit-btn" onclick="openEditModal('evento', '${eve.id}')">✏️ Editar</button></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('tab-content').innerHTML = html;
+        }
+
+        function renderObjetosTable(data) {
+            const html = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo de Objeto</th>
+                                <th>Personas Relacionadas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(obj => {
+                                const personasRel = obj.personas_relacionadas_ids 
+                                    ? obj.personas_relacionadas_ids.map(id => {
+                                        const p = personas.find(per => per.id === id);
+                                        return p ? `${p.nombre_uniforme} ${p.apellidos_uniforme}` : id;
+                                    }).join(', ')
+                                    : '-';
+                                return `
+                                    <tr>
+                                        <td><strong>${obj.id}</strong></td>
+                                        <td><span class="badge badge-info">${obj.tipo_objeto}</span></td>
+                                        <td>${personasRel}</td>
+                                        <td><button class="edit-btn" onclick="openEditModal('objeto', '${obj.id}')">✏️ Editar</button></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('tab-content').innerHTML = html;
+        }
+
+        // Funciones del modal de edición
+        let currentEditType = '';
+        let currentEditId = '';
+
+        function openEditModal(type, id) {
+            currentEditType = type;
+            currentEditId = id;
+            const modal = document.getElementById('editModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = `Editar ${type.charAt(0).toUpperCase() + type.slice(1)}: ${id}`;
+            
+            let formHTML = '';
+            let entity = null;
+
+            switch(type) {
+                case 'evento':
+                    entity = eventos.find(e => e.id === id);
+                    if (entity) {
+                        formHTML = `
+                            <form id="editForm">
+                                <div class="modal-form-group">
+                                    <label>Tipo de Evento</label>
+                                    <select id="edit-tipo_evento">
+                                        <option value="Ensayo" ${entity.tipo_evento === 'Ensayo' ? 'selected' : ''}>Ensayo</option>
+                                        <option value="Concierto" ${entity.tipo_evento === 'Concierto' ? 'selected' : ''}>Concierto</option>
+                                        <option value="Ceremonia religiosa" ${entity.tipo_evento === 'Ceremonia religiosa' ? 'selected' : ''}>Ceremonia religiosa</option>
+                                        <option value="Representación teatral" ${entity.tipo_evento === 'Representación teatral' ? 'selected' : ''}>Representación teatral</option>
+                                    </select>
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Lugar</label>
+                                    <input type="text" id="edit-lugar" value="${entity.lugar || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha Inicio</label>
+                                    <input type="date" id="edit-fecha_inicio" value="${entity.fecha_inicio || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha Fin</label>
+                                    <input type="date" id="edit-fecha_fin" value="${entity.fecha_fin || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Celebración</label>
+                                    <input type="text" id="edit-celebracion" value="${entity.celebracion || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Obra ID</label>
+                                    <input type="text" id="edit-obra_id" value="${entity.obra_id || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Personas IDs (separadas por comas)</label>
+                                    <input type="text" id="edit-personas_ids" value="${entity.personas_ids ? entity.personas_ids.join(', ') : ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Documentos IDs (separadas por comas)</label>
+                                    <input type="text" id="edit-documentos_ids" value="${entity.documentos_ids ? entity.documentos_ids.join(', ') : ''}">
+                                </div>
+                            </form>
+                        `;
+                    }
+                    break;
+                case 'documento':
+                    entity = documentos.find(d => d.id === id);
+                    if (entity) {
+                        formHTML = `
+                            <form id="editForm">
+                                <div class="modal-form-group">
+                                    <label>Tipo de Documento</label>
+                                    <select id="edit-tipo_documento">
+                                        <option value="Partitura" ${entity.tipo_documento === 'Partitura' ? 'selected' : ''}>Partitura</option>
+                                        <option value="Carta" ${entity.tipo_documento === 'Carta' ? 'selected' : ''}>Carta</option>
+                                        <option value="Documento contable" ${entity.tipo_documento === 'Documento contable' ? 'selected' : ''}>Documento contable</option>
+                                        <option value="Libreto" ${entity.tipo_documento === 'Libreto' ? 'selected' : ''}>Libreto</option>
+                                        <option value="Nombramiento" ${entity.tipo_documento === 'Nombramiento' ? 'selected' : ''}>Nombramiento</option>
+                                        <option value="Pago" ${entity.tipo_documento === 'Pago' ? 'selected' : ''}>Pago</option>
+                                        <option value="Estado" ${entity.tipo_documento === 'Estado' ? 'selected' : ''}>Estado</option>
+                                        <option value="Memorial (súplica)" ${entity.tipo_documento === 'Memorial (súplica)' ? 'selected' : ''}>Memorial (súplica)</option>
+                                    </select>
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha Inicio</label>
+                                    <input type="date" id="edit-fecha_inicio" value="${entity.fecha_inicio || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha Fin</label>
+                                    <input type="date" id="edit-fecha_fin" value="${entity.fecha_fin || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Lugar</label>
+                                    <input type="text" id="edit-lugar" value="${entity.lugar || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Signatura</label>
+                                    <input type="text" id="edit-signatura" value="${entity.signatura || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Texto</label>
+                                    <textarea id="edit-texto">${entity.texto || ''}</textarea>
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Emisor ID</label>
+                                    <input type="text" id="edit-emisor_id" value="${entity.emisor_id || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Destinatario ID</label>
+                                    <input type="text" id="edit-destinatario_id" value="${entity.destinatario_id || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Obra Musical ID</label>
+                                    <input type="text" id="edit-obra_musical_id" value="${entity.obra_musical_id || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Evento ID</label>
+                                    <input type="text" id="edit-evento_id" value="${entity.evento_id || ''}">
+                                </div>
+                            </form>
+                        `;
+                    }
+                    break;
+                case 'persona':
+                    entity = personas.find(p => p.id === id);
+                    if (entity) {
+                        formHTML = `
+                            <form id="editForm">
+                                <div class="modal-form-group">
+                                    <label>Nombre Uniforme</label>
+                                    <input type="text" id="edit-nombre_uniforme" value="${entity.nombre_uniforme || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Apellidos Uniforme</label>
+                                    <input type="text" id="edit-apellidos_uniforme" value="${entity.apellidos_uniforme || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Género</label>
+                                    <select id="edit-genero">
+                                        <option value="">-</option>
+                                        <option value="M" ${entity.genero === 'M' ? 'selected' : ''}>M</option>
+                                        <option value="F" ${entity.genero === 'F' ? 'selected' : ''}>F</option>
+                                    </select>
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Función</label>
+                                    <select id="edit-funcion">
+                                        <option value="músico" ${entity.funcion === 'músico' ? 'selected' : ''}>músico</option>
+                                        <option value="no músico" ${entity.funcion === 'no músico' ? 'selected' : ''}>no músico</option>
+                                    </select>
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Cargo Profesional</label>
+                                    <input type="text" id="edit-cargo_profesional" value="${entity.cargo_profesional || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha Nacimiento</label>
+                                    <input type="text" id="edit-fecha_nacimiento" value="${entity.fecha_nacimiento || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha Muerte</label>
+                                    <input type="text" id="edit-fecha_muerte" value="${entity.fecha_muerte || ''}">
+                                </div>
+                            </form>
+                        `;
+                    }
+                    break;
+                case 'obra':
+                    entity = obras.find(o => o.id === id);
+                    if (entity) {
+                        formHTML = `
+                            <form id="editForm">
+                                <div class="modal-form-group">
+                                    <label>Título Uniforme</label>
+                                    <input type="text" id="edit-titulo_uniforme" value="${entity.titulo_uniforme || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Compositor ID</label>
+                                    <input type="text" id="edit-compositor_id" value="${entity.compositor_id || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Libretista ID</label>
+                                    <input type="text" id="edit-libretista_id" value="${entity.libretista_id || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Género Musical</label>
+                                    <input type="text" id="edit-genero_musical" value="${entity.genero_musical || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha</label>
+                                    <input type="text" id="edit-fecha" value="${entity.fecha || ''}">
+                                </div>
+                            </form>
+                        `;
+                    }
+                    break;
+                case 'objeto':
+                    entity = objetos.find(o => o.id === id);
+                    if (entity) {
+                        formHTML = `
+                            <form id="editForm">
+                                <div class="modal-form-group">
+                                    <label>Tipo de Objeto</label>
+                                    <input type="text" id="edit-tipo_objeto" value="${entity.tipo_objeto || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Personas Relacionadas IDs (separadas por comas)</label>
+                                    <input type="text" id="edit-personas_relacionadas_ids" value="${entity.personas_relacionadas_ids ? entity.personas_relacionadas_ids.join(', ') : ''}">
+                                </div>
+                            </form>
+                        `;
+                    }
+                    break;
+            }
+
+            modalBody.innerHTML = formHTML + `
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button class="modal-btn modal-btn-primary" onclick="saveEdit()">Guardar Cambios</button>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveEdit() {
+            const entity = getEntity(currentEditType, currentEditId);
+            if (!entity) return;
+
+            // Recopilar datos del formulario según el tipo
+            switch(currentEditType) {
+                case 'evento':
+                    entity.tipo_evento = document.getElementById('edit-tipo_evento').value;
+                    entity.lugar = document.getElementById('edit-lugar').value;
+                    entity.fecha_inicio = document.getElementById('edit-fecha_inicio').value;
+                    entity.fecha_fin = document.getElementById('edit-fecha_fin').value;
+                    entity.celebracion = document.getElementById('edit-celebracion').value;
+                    entity.obra_id = document.getElementById('edit-obra_id').value || null;
+                    const personasIds = document.getElementById('edit-personas_ids').value;
+                    entity.personas_ids = personasIds ? personasIds.split(',').map(id => id.trim()).filter(id => id) : [];
+                    const documentosIds = document.getElementById('edit-documentos_ids').value;
+                    entity.documentos_ids = documentosIds ? documentosIds.split(',').map(id => id.trim()).filter(id => id) : [];
+                    break;
+                case 'documento':
+                    entity.tipo_documento = document.getElementById('edit-tipo_documento').value;
+                    entity.fecha_inicio = document.getElementById('edit-fecha_inicio').value;
+                    entity.fecha_fin = document.getElementById('edit-fecha_fin').value;
+                    entity.lugar = document.getElementById('edit-lugar').value;
+                    entity.signatura = document.getElementById('edit-signatura').value;
+                    entity.texto = document.getElementById('edit-texto').value;
+                    entity.emisor_id = document.getElementById('edit-emisor_id').value || null;
+                    entity.destinatario_id = document.getElementById('edit-destinatario_id').value || null;
+                    entity.obra_musical_id = document.getElementById('edit-obra_musical_id').value || null;
+                    entity.evento_id = document.getElementById('edit-evento_id').value || null;
+                    break;
+                case 'persona':
+                    entity.nombre_uniforme = document.getElementById('edit-nombre_uniforme').value;
+                    entity.apellidos_uniforme = document.getElementById('edit-apellidos_uniforme').value;
+                    entity.genero = document.getElementById('edit-genero').value || null;
+                    entity.funcion = document.getElementById('edit-funcion').value;
+                    entity.cargo_profesional = document.getElementById('edit-cargo_profesional').value || null;
+                    entity.fecha_nacimiento = document.getElementById('edit-fecha_nacimiento').value || null;
+                    entity.fecha_muerte = document.getElementById('edit-fecha_muerte').value || null;
+                    break;
+                case 'obra':
+                    entity.titulo_uniforme = document.getElementById('edit-titulo_uniforme').value;
+                    entity.compositor_id = document.getElementById('edit-compositor_id').value || null;
+                    entity.libretista_id = document.getElementById('edit-libretista_id').value || null;
+                    entity.genero_musical = document.getElementById('edit-genero_musical').value || null;
+                    entity.fecha = document.getElementById('edit-fecha').value || null;
+                    break;
+                case 'objeto':
+                    entity.tipo_objeto = document.getElementById('edit-tipo_objeto').value;
+                    const personasRelIds = document.getElementById('edit-personas_relacionadas_ids').value;
+                    entity.personas_relacionadas_ids = personasRelIds ? personasRelIds.split(',').map(id => id.trim()).filter(id => id) : [];
+                    break;
+            }
+
+            // Guardar cambios (en producción esto iría al servidor)
+            alert(`Cambios guardados para ${currentEditType} ${currentEditId}`);
+            
+            // Recargar la tabla actual
+            renderTable(currentTab);
+            closeModal();
+        }
+
+        function getEntity(type, id) {
+            switch(type) {
+                case 'evento': return eventos.find(e => e.id === id);
+                case 'documento': return documentos.find(d => d.id === id);
+                case 'persona': return personas.find(p => p.id === id);
+                case 'obra': return obras.find(o => o.id === id);
+                case 'objeto': return objetos.find(o => o.id === id);
+                default: return null;
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Inicializar cuando se carga la página
+        loadData();
+    </script>
+
+    <!-- Modal para editar entidades -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Editar</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody">
+                <!-- El contenido del formulario se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

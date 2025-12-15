@@ -1,0 +1,18 @@
+Orden,Campos,Tipo de campo (Tesauro/Libre),Tesauro,Tareas,Observaciones
+,Tipo de documento,T,Memorial (súplica); Documento contable; Estado; Partitura; Carta; Libreto; Prensa; Protocolo; Ley; Decreto; Nombramiento; Pago; Cuenta; Anuncio; Aviso; Descripción; Informe,DEFINIR TIPOS ,"Ver Performart. Ampliar los tipos al tipo de ""producto"": por ejemplo, bolsillo secreto; copia; cerería; partituras"
+,Fecha inicio,T,,,Normalizado
+,Fecha fin,T,,Pensar si OTRAS FECHAS,Normalizado
+,Lugar,T,,DEFINIR ÁRBOL,Normalizado - árbol
+,Observaciones lugar,L,,,Cuando no cuadra con el árbol
+,Texto,L,,,Transcripción
+,Emisor,Entidad Persona,,,Persona / Institución
+,Destinatario,Entidad Persona,,,Persona / Institución
+,Sección administrativa,T,,,
+,Otras personas,Entidad,,,Hay que pensar en incluir a las personas reales
+,Evento,Entidad,,,
+,Obra musical,L,,Título uniforme?,
+,Signatura,L,,,
+,Práctica musical,L,,,
+,Objeto musical,??,,,"Instrumentos, imágenes, atriles, papelera, cajas para partituras, cuerdas de instrumento, etc."
+,Autor,T,,,Autor de la ficha
+,,,,"Pensar título: por ejemplo, signatura - tipo - lugar",

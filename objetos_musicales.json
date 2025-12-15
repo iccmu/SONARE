@@ -1,0 +1,33 @@
+[
+  {
+    "id": "OBJ001",
+    "tipo_objeto": "Partitura manuscrita",
+    "personas_relacionadas_ids": ["PER001", "PER002"]
+  },
+  {
+    "id": "OBJ002",
+    "tipo_objeto": "Violín",
+    "personas_relacionadas_ids": ["PER004", "PER012"]
+  },
+  {
+    "id": "OBJ003",
+    "tipo_objeto": "Violín",
+    "personas_relacionadas_ids": ["PER012"]
+  },
+  {
+    "id": "OBJ004",
+    "tipo_objeto": "Órgano",
+    "personas_relacionadas_ids": ["PER003"]
+  },
+  {
+    "id": "OBJ005",
+    "tipo_objeto": "Atril",
+    "personas_relacionadas_ids": []
+  },
+  {
+    "id": "OBJ006",
+    "tipo_objeto": "Caja para partituras",
+    "personas_relacionadas_ids": ["PER001"]
+  }
+]
+

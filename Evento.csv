@@ -1,0 +1,9 @@
+Orden,Campos,Tipo de campo (Tesauro/Libre),Tesauro,Tareas,Observaciones
+,Tipo de evento,T,Ensayo; Concierto; Ceremonia religiosa; Representación teatral,,
+,Lugar,,,,
+,Fecha incio,,,,
+,Fecha fin,,,,
+,Celebración,,,,Motivo
+,Personas,Relaciones,,,
+,Obra,Relaciones,,,
+,Documentos,Relaciones,,,

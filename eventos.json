@@ -1,0 +1,91 @@
+[
+  {
+    "id": "EVE001",
+    "tipo_evento": "Ceremonia religiosa",
+    "lugar": "Madrid > Palacio Real > Capilla Real",
+    "fecha_inicio": "1785-03-15",
+    "fecha_fin": "1785-03-15",
+    "celebracion": "Misa solemne de Pascua",
+    "personas_ids": ["PER001", "PER002", "PER003"],
+    "obra_id": "OBR001",
+    "documentos_ids": ["DOC001", "DOC006", "DOC007"]
+  },
+  {
+    "id": "EVE002",
+    "tipo_evento": "Representación teatral",
+    "lugar": "Madrid > Teatro de los Caños del Peral > Escenario Principal",
+    "fecha_inicio": "1792-09-10",
+    "fecha_fin": "1792-09-10",
+    "celebracion": "Estreno de ópera",
+    "personas_ids": ["PER009", "PER010", "PER011"],
+    "obra_id": "OBR002",
+    "documentos_ids": ["DOC004", "DOC003"]
+  },
+  {
+    "id": "EVE003",
+    "tipo_evento": "Concierto",
+    "lugar": "Madrid > Palacio Real > Capilla Real",
+    "fecha_inicio": "1791-11-15",
+    "fecha_fin": "1791-11-30",
+    "celebracion": "Concierto mensual de la Real Capilla",
+    "personas_ids": ["PER001", "PER012", "PER013"],
+    "obra_id": "OBR001",
+    "documentos_ids": ["DOC006", "DOC001", "DOC009"]
+  },
+  {
+    "id": "EVE004",
+    "tipo_evento": "Ensayo",
+    "lugar": "Sevilla > Catedral de Sevilla > Sala de Ensayos",
+    "fecha_inicio": "1790-06-18",
+    "fecha_fin": "1790-06-18",
+    "celebracion": "Ensayo general",
+    "personas_ids": ["PER004"],
+    "obra_id": null,
+    "documentos_ids": []
+  },
+  {
+    "id": "EVE005",
+    "tipo_evento": "Ceremonia religiosa",
+    "lugar": "Madrid > El Escorial > Basílica > Sala de Celebraciones",
+    "fecha_inicio": "1786-06-24",
+    "fecha_fin": "1786-06-24",
+    "celebracion": "Día de San Juan",
+    "personas_ids": ["PER001", "PER003"],
+    "obra_id": null,
+    "documentos_ids": []
+  },
+  {
+    "id": "EVE006",
+    "tipo_evento": "Ceremonia religiosa",
+    "lugar": "Madrid > Palacio Real > Capilla Real",
+    "fecha_inicio": "1789-05-15",
+    "fecha_fin": "1789-05-15",
+    "celebracion": "Beatificación de San Juan de Dios",
+    "personas_ids": ["PER001", "PER002", "PER003"],
+    "obra_id": null,
+    "documentos_ids": ["DOC007", "DOC001"]
+  },
+  {
+    "id": "EVE007",
+    "tipo_evento": "Concierto",
+    "lugar": "Madrid > Palacio Real > Salón de Columnas",
+    "fecha_inicio": "1790-12-25",
+    "fecha_fin": "1790-12-25",
+    "celebracion": "Recepción de Navidad",
+    "personas_ids": ["PER001", "PER002", "PER012", "PER013"],
+    "obra_id": null,
+    "documentos_ids": ["DOC003", "DOC009"]
+  },
+  {
+    "id": "EVE008",
+    "tipo_evento": "Ceremonia religiosa",
+    "lugar": "Madrid > Palacio Real > Capilla Real",
+    "fecha_inicio": "1788-07-20",
+    "fecha_fin": "1788-07-20",
+    "celebracion": "Boda Real",
+    "personas_ids": ["PER001", "PER002", "PER007", "PER008"],
+    "obra_id": null,
+    "documentos_ids": ["DOC003", "DOC005", "DOC007"]
+  }
+]
+
