@@ -1,0 +1,324 @@
+{% extends "sonare_app/base.html" %}
+{% block title %}Editar {{ doc.id }}{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb-sonare">
+  <a href="{% url 'sonare:home' %}">Inicio</a>
+  <span class="sep">/</span>
+  <a href="{% url 'sonare:documento_list' %}">Documentos</a>
+  <span class="sep">/</span>
+  <a href="{% url 'sonare:documento_detail' doc.id %}">{{ doc.id }}</a>
+  <span class="sep">/</span>
+  <span>Editar</span>
+</div>
+
+<div class="page-header">
+  <h1 style="font-size:1.5rem;"><i class="bi bi-pencil-square" style="color:var(--gold);"></i> Editar documento</h1>
+  <span class="subtitle">{{ doc.id }} — {{ doc.tipo_documento }}</span>
+</div>
+
+<form method="post" id="edit-form">
+  {% csrf_token %}
+
+  <div class="row g-4">
+
+    <!-- Columna principal -->
+    <div class="col-12 col-md-8">
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Identificación</div>
+        <div class="edit-grid">
+          <div class="edit-field">
+            <label>{{ form.tipo_documento.label }}</label>
+            {{ form.tipo_documento }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.signatura.label }}</label>
+            {{ form.signatura }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Fechas y lugar</div>
+        <div class="edit-grid">
+          <div class="edit-field">
+            <label>{{ form.fecha_documento.label }}</label>
+            {{ form.fecha_documento }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.lugar_documento.label }}</label>
+            {{ form.lugar_documento }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.fecha_inicio.label }}</label>
+            {{ form.fecha_inicio }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.fecha_fin.label }}</label>
+            {{ form.fecha_fin }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.lugar_ref.label }}</label>
+            {{ form.lugar_ref }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.observaciones_lugar.label }}</label>
+            {{ form.observaciones_lugar }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Texto y contenido</div>
+        <div class="edit-grid">
+          <div class="edit-field edit-field--full">
+            <label>{{ form.texto.label }}</label>
+            {{ form.texto }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.practica_musical.label }}</label>
+            {{ form.practica_musical }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.evento_descripcion.label }}</label>
+            {{ form.evento_descripcion }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.objeto_musical_desc.label }}</label>
+            {{ form.objeto_musical_desc }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.autor.label }}</label>
+            {{ form.autor }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Real Cerería</div>
+        <div class="edit-grid">
+          <div class="edit-field">
+            <label>{{ form.hora.label }}</label>
+            {{ form.hora }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.luces.label }}</label>
+            {{ form.luces }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Observaciones</div>
+        <div class="edit-field edit-field--full">
+          {{ form.observaciones }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Columna lateral -->
+    <div class="col-12 col-md-4">
+
+      <div class="card-sonare" style="margin-bottom:1rem;">
+        <div class="detail-section-title">Personas</div>
+        <div class="edit-grid" style="grid-template-columns:1fr;">
+
+          {% for field_name, field_label in field_personas %}
+          <div class="edit-field" id="wrap_{{ field_name }}">
+            <label>{{ field_label }}</label>
+            <input type="text" class="persona-search form-control"
+                   data-target="list_{{ field_name }}"
+                   placeholder="Filtrar por nombre…"
+                   style="margin-bottom:0.4rem; font-size:0.82rem;">
+            <div class="persona-list" id="list_{{ field_name }}">
+              {% if field_name == 'emisor' %}{{ form.emisor }}
+              {% elif field_name == 'visto' %}{{ form.visto }}
+              {% elif field_name == 'destinatario' %}{{ form.destinatario }}
+              {% elif field_name == 'otras_personas' %}{{ form.otras_personas }}
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1rem;">
+        <div class="detail-section-title">Sección administrativa</div>
+        <div class="edit-grid" style="grid-template-columns:1fr;">
+          <div class="edit-field">
+            <label>{{ form.seccion_administrativa_emision.label }}</label>
+            {{ form.seccion_administrativa_emision }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.seccion_administrativa_recepcion.label }}</label>
+            {{ form.seccion_administrativa_recepcion }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Flags</div>
+        <div style="display:flex; align-items:center; gap:0.6rem; padding:0.3rem 0;">
+          {{ form.mencion_musica }}
+          <label for="{{ form.mencion_musica.id_for_label }}" style="margin:0; font-size:0.9rem; cursor:pointer;">
+            {{ form.mencion_musica.label }}
+          </label>
+        </div>
+        {% if form.mencion_musica.errors %}
+          <div class="form-error">{{ form.mencion_musica.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Errores globales -->
+      {% if form.errors %}
+      <div class="card-sonare" style="border-left:3px solid #c0392b; margin-bottom:1rem;">
+        <div style="color:#c0392b; font-size:0.85rem;">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}<div>{{ field }}: {{ error }}</div>{% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Acciones -->
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <button type="submit" class="btn-gold">
+          <i class="bi bi-check-lg"></i> Guardar
+        </button>
+        <a href="{% url 'sonare:documento_detail' doc.id %}" class="btn-navy">
+          <i class="bi bi-x"></i> Cancelar
+        </a>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Scroll suave + animación de destello al llegar desde una tarjeta
+  document.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+    if (!hash) return;
+    const el = document.querySelector(hash);
+    if (!el) return;
+
+    // Scroll suave: campo centrado exactamente a mitad de pantalla
+    const rect = el.getBoundingClientRect();
+    const targetY = window.pageYOffset + rect.top - (window.innerHeight / 2) + (rect.height / 2);
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+
+    // Animación tras el scroll (~duración del scroll suave)
+    setTimeout(() => {
+      el.classList.add('field-flash');
+      el.focus();
+      el.addEventListener('animationend', () => el.classList.remove('field-flash'), { once: true });
+    }, 500);
+  });
+</script>
+<style>
+  @keyframes field-flash {
+    0%   { background: rgba(180,145,60,0.35); box-shadow: 0 0 0 4px rgba(180,145,60,0.4); }
+    60%  { background: rgba(180,145,60,0.15); box-shadow: 0 0 0 2px rgba(180,145,60,0.2); }
+    100% { background: transparent; box-shadow: none; }
+  }
+  .field-flash {
+    animation: field-flash 1.2s ease-out forwards;
+    border-radius: 4px;
+  }
+  .edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.5rem;
+  }
+  .edit-field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .edit-field--full { grid-column: 1 / -1; }
+  .edit-field label {
+    font-size: 0.78rem;
+    font-family: var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .edit-field .form-control {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.88rem;
+    font-family: var(--sans);
+    background: var(--white);
+    color: var(--text);
+    transition: border-color 0.15s;
+  }
+  .edit-field .form-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(180,145,60,0.15);
+  }
+  .form-check-input { width: 1.1rem; height: 1.1rem; cursor: pointer; accent-color: var(--gold); }
+  .form-error { color: #c0392b; font-size: 0.82rem; margin-top: 0.2rem; }
+  @media (max-width: 576px) { .edit-grid { grid-template-columns: 1fr; } }
+
+  /* ── Listas de personas con checkbox/radio ───────────────────── */
+  .persona-list {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--white);
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.4rem 0.5rem;
+  }
+  .persona-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .persona-list li {
+    padding: 0.25rem 0.3rem;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    transition: background 0.1s;
+  }
+  .persona-list li:hover { background: var(--parchment); }
+  .persona-list li.hidden { display: none; }
+  .persona-list input[type="radio"],
+  .persona-list input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .persona-list label { cursor: pointer; margin: 0; user-select: none; }
+  /* Opción "Ninguno" en radio */
+  .persona-list li.none-option { color: var(--text-muted); font-style: italic; }
+</style>
+
+<script>
+  // ── Buscador en listas de personas ─────────────────────────────
+  document.querySelectorAll('.persona-search').forEach(input => {
+    const listId = input.dataset.target;
+    const list = document.getElementById(listId);
+
+    input.addEventListener('input', () => {
+      const q = input.value.toLowerCase().trim();
+      list.querySelectorAll('li').forEach(li => {
+        const label = li.querySelector('label');
+        if (!label) return;
+        const match = label.textContent.toLowerCase().includes(q);
+        li.classList.toggle('hidden', !match);
+      });
+    });
+  });
+</script>
+{% endblock %}

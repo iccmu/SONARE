@@ -1,0 +1,92 @@
+<div class="doc-card clickable-row" data-href="{% url 'sonare:documento_detail' doc.id %}">
+
+  <!-- Cabecera: ID + tipo + flags + fecha + lugar -->
+  <div class="doc-card-header">
+    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+      <span class="doc-card-id">{{ doc.id }}</span>
+      <a href="{% url 'sonare:documento_edit' doc.id %}#id_tipo_documento"
+         class="doc-field-link badge-sonare badge-doc" style="font-size:0.72rem;"
+         title="Editar tipo de documento">
+        {{ doc.tipo_documento|truncatechars:50 }}
+      </a>
+      {% if doc.mencion_musica %}
+        <span class="badge-sonare badge-green" style="font-size:0.72rem;"><i class="bi bi-music-note"></i> Música</span>
+      {% endif %}
+    </div>
+    <div class="doc-card-meta">
+      {% if doc.fecha_documento %}
+        <a href="{% url 'sonare:documento_edit' doc.id %}#id_fecha_documento"
+           class="doc-field-link" title="Editar fecha">
+          <i class="bi bi-calendar3"></i> {{ doc.fecha_documento }}
+        </a>
+      {% endif %}
+      {% if doc.lugar_ref %}
+        <a href="{% url 'sonare:documento_edit' doc.id %}#id_lugar_ref"
+           class="doc-field-link" title="Editar lugar">
+          <i class="bi bi-geo-alt"></i>
+          {% if doc.lugar_ref.padre %}{{ doc.lugar_ref.padre.nombre }} ›{% endif %}
+          {{ doc.lugar_ref.nombre }}
+        </a>
+      {% elif doc.lugar_documento %}
+        <a href="{% url 'sonare:documento_edit' doc.id %}#id_lugar_documento"
+           class="doc-field-link" title="Editar lugar">
+          <i class="bi bi-geo-alt"></i> {{ doc.lugar_documento }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Participantes y roles -->
+  <div class="doc-card-roles">
+    {% if doc.emisor %}
+    <a href="{% url 'sonare:documento_edit' doc.id %}#id_emisor"
+       class="doc-role doc-field-link {% if rol_destacado == 'emisor' %}doc-role--active{% endif %}"
+       title="Editar emisor">
+      <span class="doc-role-label">Emisor</span>
+      <span class="doc-role-persona">{{ doc.emisor }}</span>
+    </a>
+    {% endif %}
+    {% if doc.visto %}
+    <a href="{% url 'sonare:documento_edit' doc.id %}#id_visto"
+       class="doc-role doc-field-link {% if rol_destacado == 'visto' %}doc-role--active{% endif %}"
+       title="Editar supervisor">
+      <span class="doc-role-label">Supervisor</span>
+      <span class="doc-role-persona">{{ doc.visto }}</span>
+    </a>
+    {% endif %}
+    {% if doc.destinatario %}
+    <a href="{% url 'sonare:documento_edit' doc.id %}#id_destinatario"
+       class="doc-role doc-field-link {% if rol_destacado == 'destinatario' %}doc-role--active{% endif %}"
+       title="Editar destinatario">
+      <span class="doc-role-label">Destinatario</span>
+      <span class="doc-role-persona">{{ doc.destinatario }}</span>
+    </a>
+    {% endif %}
+    {% if rol_destacado == 'citado' %}
+    <div class="doc-role doc-role--active">
+      <span class="doc-role-label">Citado/a</span>
+      <span class="doc-role-persona">{{ persona }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if doc.practica_musical and doc.practica_musical != 'None' %}
+  <a href="{% url 'sonare:documento_edit' doc.id %}#id_practica_musical"
+     class="doc-card-practica doc-field-link" title="Editar práctica musical">
+    <i class="bi bi-music-note-beamed" style="opacity:0.5; margin-right:0.3rem;"></i>{{ doc.practica_musical|truncatechars:120 }}
+  </a>
+  {% endif %}
+
+  {% if mostrar_vacios %}
+  <div class="doc-card-vacios">
+    <span style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-family:var(--sans);">Campos vacíos:</span>
+    {% if not doc.emisor %}<a href="{% url 'sonare:documento_edit' doc.id %}#id_emisor" class="campo-vacio">emisor</a>{% endif %}
+    {% if not doc.visto %}<a href="{% url 'sonare:documento_edit' doc.id %}#id_visto" class="campo-vacio">supervisor</a>{% endif %}
+    {% if not doc.destinatario %}<a href="{% url 'sonare:documento_edit' doc.id %}#id_destinatario" class="campo-vacio">destinatario</a>{% endif %}
+    {% if not doc.practica_musical or doc.practica_musical == 'None' %}<a href="{% url 'sonare:documento_edit' doc.id %}#id_practica_musical" class="campo-vacio">práctica musical</a>{% endif %}
+    {% if not doc.objeto_musical_desc %}<a href="{% url 'sonare:documento_edit' doc.id %}#id_objeto_musical_desc" class="campo-vacio">objeto musical</a>{% endif %}
+    {% if not doc.observaciones %}<a href="{% url 'sonare:documento_edit' doc.id %}#id_observaciones" class="campo-vacio">observaciones</a>{% endif %}
+  </div>
+  {% endif %}
+
+</div>

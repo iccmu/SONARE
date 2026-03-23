@@ -1,0 +1,151 @@
+{% extends "sonare_app/base.html" %}
+{% block title %}Editar {{ persona }}{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb-sonare">
+  <a href="{% url 'sonare:home' %}">Inicio</a>
+  <span class="sep">/</span>
+  <a href="{% url 'sonare:persona_list' %}">Personas</a>
+  <span class="sep">/</span>
+  <a href="{% url 'sonare:persona_detail' persona.id %}">{{ persona }}</a>
+  <span class="sep">/</span>
+  <span>Editar</span>
+</div>
+
+<div class="page-header">
+  <h1 style="font-size:1.5rem;"><i class="bi bi-pencil-square" style="color:var(--gold);"></i> Editar persona</h1>
+  <span class="subtitle">{{ persona.id }}</span>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="row g-4">
+    <div class="col-12 col-md-7">
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Nombre</div>
+        <div class="edit-grid">
+          <div class="edit-field">
+            <label>{{ form.nombre_uniforme.label }}</label>
+            {{ form.nombre_uniforme }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.apellidos_uniforme.label }}</label>
+            {{ form.apellidos_uniforme }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.otras_formas_nombre.label }}</label>
+            {{ form.otras_formas_nombre }}
+          </div>
+          <div class="edit-field edit-field--full">
+            <label>{{ form.titulo_nobiliario.label }}</label>
+            {{ form.titulo_nobiliario }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Datos biográficos</div>
+        <div class="edit-grid">
+          <div class="edit-field">
+            <label>{{ form.genero.label }}</label>
+            {{ form.genero }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.id_viaff.label }}</label>
+            {{ form.id_viaff }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.fecha_nacimiento.label }}</label>
+            {{ form.fecha_nacimiento }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.fecha_muerte.label }}</label>
+            {{ form.fecha_muerte }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-sonare" style="margin-bottom:1.5rem;">
+        <div class="detail-section-title">Función y cargo</div>
+        <div class="edit-grid">
+          <div class="edit-field">
+            <label>{{ form.funcion.label }}</label>
+            {{ form.funcion }}
+          </div>
+          <div class="edit-field">
+            <label>{{ form.cargo_profesional.label }}</label>
+            {{ form.cargo_profesional }}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-12 col-md-5">
+      <div class="card-sonare" style="margin-bottom:1rem; padding:1rem;">
+        <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-muted); margin-bottom:0.5rem;">ID del registro</div>
+        <code style="font-size:0.9rem; color:var(--navy);">{{ persona.id }}</code>
+      </div>
+
+      {% if form.errors %}
+      <div class="card-sonare" style="border-left:3px solid #c0392b; margin-bottom:1rem;">
+        <div style="color:#c0392b; font-size:0.85rem;">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}<div>{{ field }}: {{ error }}</div>{% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <button type="submit" class="btn-gold">
+          <i class="bi bi-check-lg"></i> Guardar
+        </button>
+        <a href="{% url 'sonare:persona_detail' persona.id %}" class="btn-navy">
+          <i class="bi bi-x"></i> Cancelar
+        </a>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<style>
+  .edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.5rem;
+  }
+  .edit-field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .edit-field--full { grid-column: 1 / -1; }
+  .edit-field label {
+    font-size: 0.78rem;
+    font-family: var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .edit-field .form-control {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.88rem;
+    font-family: var(--sans);
+    background: var(--white);
+    color: var(--text);
+    transition: border-color 0.15s;
+  }
+  .edit-field .form-control:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(180,145,60,0.15);
+  }
+  @media (max-width: 576px) { .edit-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}

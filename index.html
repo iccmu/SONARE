@@ -552,6 +552,12 @@
                         <option value="">Todas</option>
                     </select>
                 </div>
+                <div class="filter-group">
+                    <label>Tipo de Documento</label>
+                    <select id="filter-tipo-doc">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
             </div>
             <button class="clear-filters" onclick="clearFilters()">Limpiar Filtros</button>
             <div class="stats">
@@ -681,6 +687,16 @@
                 document.getElementById('filter-celebracion').appendChild(option);
             });
 
+            // Tipos de documento
+            const tiposDoc = [...new Set(documentos.map(d => d.tipo_documento).filter(t => t))].sort();
+            tiposDoc.forEach(tipo => {
+                const option = document.createElement('option');
+                option.value = tipo;
+                option.textContent = tipo;
+                document.getElementById('filter-tipo-doc').appendChild(option);
+            });
+            document.getElementById('filter-tipo-doc').addEventListener('change', applyFilters);
+
             // Event listeners
             document.getElementById('filter-persona').addEventListener('change', applyFilters);
             document.getElementById('filter-lugar-ciudad').addEventListener('change', updateLugarFilters);
@@ -795,8 +811,12 @@
                 updateStats(filtered.length, 'eventos');
                 renderFilteredTable(filtered);
             } else {
+                const tipoDoc = document.getElementById('filter-tipo-doc').value;
                 // Filtrar documentos
                 let filtered = documentos.filter(doc => {
+                    // Filtro por tipo de documento
+                    if (tipoDoc && doc.tipo_documento !== tipoDoc) return false;
+
                     // Filtro por persona (autor, receptor, citada)
                     if (persona) {
                         const matchesPersona = 
@@ -853,7 +873,8 @@
             document.getElementById('filter-fecha-desde').value = '';
             document.getElementById('filter-fecha-hasta').value = '';
             document.getElementById('filter-celebracion').value = '';
-            
+            document.getElementById('filter-tipo-doc').value = '';
+
             // Resetear los selectores jerárquicos
             document.getElementById('filter-lugar-edificio').innerHTML = '<option value="">Todos los edificios</option>';
             document.getElementById('filter-lugar-sala').innerHTML = '<option value="">Todas las salas</option>';
@@ -984,7 +1005,7 @@
                                         ${showRol ? `<td>${rolBadge}</td>` : ''}
                                         <td>${obra ? obra.titulo_uniforme : '-'}</td>
                                         <td>${doc.signatura}</td>
-                                        <td class="text-truncate" title="${doc.texto}">${doc.texto}</td>
+                                        <td class="text-truncate" title="${[doc.hora, doc.numero_musica ? doc.numero_musica + ' velas música' : null, doc.luces, doc.texto].filter(Boolean).join(' | ')}">${doc.numero_musica ? `<small style="color:#764ba2">${doc.numero_musica}🕯 ${doc.hora || ''}</small> ` : ''}${doc.texto || '-'}</td>
                                         <td><button class="edit-btn" onclick="openEditModal('documento', '${doc.id}')">✏️ Editar</button></td>
                                     </tr>
                                 `;
@@ -1271,7 +1292,16 @@
                                         <option value="Pago" ${entity.tipo_documento === 'Pago' ? 'selected' : ''}>Pago</option>
                                         <option value="Estado" ${entity.tipo_documento === 'Estado' ? 'selected' : ''}>Estado</option>
                                         <option value="Memorial (súplica)" ${entity.tipo_documento === 'Memorial (súplica)' ? 'selected' : ''}>Memorial (súplica)</option>
+                                        <option value="Cuenta simple de gasto extraordinario" ${entity.tipo_documento === 'Cuenta simple de gasto extraordinario' ? 'selected' : ''}>Cuenta simple de gasto extraordinario</option>
                                     </select>
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Fecha Documento</label>
+                                    <input type="text" id="edit-fecha_documento" value="${entity.fecha_documento || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Lugar Documento</label>
+                                    <input type="text" id="edit-lugar_documento" value="${entity.lugar_documento || ''}">
                                 </div>
                                 <div class="modal-form-group">
                                     <label>Fecha Inicio</label>
@@ -1309,6 +1339,38 @@
                                     <label>Evento ID</label>
                                     <input type="text" id="edit-evento_id" value="${entity.evento_id || ''}">
                                 </div>
+                                ${entity.numero_total || entity.numero_musica || entity.luces ? `
+                                <hr style="margin:15px 0;border-color:#e9ecef">
+                                <p style="font-weight:600;color:#764ba2;margin-bottom:10px">Datos Cerería</p>
+                                <div class="modal-form-group">
+                                    <label>Hora</label>
+                                    <input type="text" id="edit-hora" value="${entity.hora || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Número total velas</label>
+                                    <input type="text" id="edit-numero_total" value="${entity.numero_total || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Número velas música</label>
+                                    <input type="text" id="edit-numero_musica" value="${entity.numero_musica || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Tipo de luces</label>
+                                    <input type="text" id="edit-luces" value="${entity.luces || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Objeto musical</label>
+                                    <input type="text" id="edit-objeto_musical_desc" value="${entity.objeto_musical_desc || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Mención música</label>
+                                    <input type="text" id="edit-mencion_musica" value="${entity.mencion_musica || ''}">
+                                </div>
+                                <div class="modal-form-group">
+                                    <label>Observaciones</label>
+                                    <textarea id="edit-observaciones">${entity.observaciones || ''}</textarea>
+                                </div>
+                                ` : ''}
                             </form>
                         `;
                     }

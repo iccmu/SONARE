@@ -1,0 +1,193 @@
+{% extends "sonare_app/base.html" %}
+{% block title %}{{ persona }}{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb-sonare">
+  <a href="{% url 'sonare:home' %}">Inicio</a>
+  <span class="sep">/</span>
+  <a href="{% url 'sonare:persona_list' %}">Personas</a>
+  <span class="sep">/</span>
+  <span>{{ persona }}</span>
+</div>
+
+<div class="row g-4">
+
+  <!-- Columna principal: documentos -->
+  <div class="col-12 col-md-8">
+
+    <div class="page-header">
+      <h1>{{ persona.nombre_uniforme }} {{ persona.apellidos_uniforme }}</h1>
+      {% if persona.titulo_nobiliario %}
+        <p class="subtitle">{{ persona.titulo_nobiliario }}</p>
+      {% endif %}
+    </div>
+
+    {% with total=docs_emitidos|length|add:docs_visados|length|add:docs_recibidos|length|add:docs_citado|length %}
+    {% if total == 0 %}
+      <div class="card-sonare" style="text-align:center; color:var(--text-muted); font-style:italic; padding:2rem;">
+        Esta persona no está asociada a ningún documento.
+      </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Macro: lista de documentos con contexto relacional -->
+    {% if docs_emitidos %}
+    <div class="detail-section">
+      <div class="detail-section-title">
+        <i class="bi bi-send" style="color:var(--gold);"></i> Emisor
+        <span class="doc-count">{{ docs_emitidos|length }}</span>
+      </div>
+      {% for doc in docs_emitidos %}
+        {% include "sonare_app/personas/_doc_card.html" with doc=doc rol_destacado="emisor" persona=persona %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if docs_visados %}
+    <div class="detail-section">
+      <div class="detail-section-title">
+        <i class="bi bi-eye" style="color:var(--gold);"></i> Supervisor / Visto
+        <span class="doc-count">{{ docs_visados|length }}</span>
+      </div>
+      {% for doc in docs_visados %}
+        {% include "sonare_app/personas/_doc_card.html" with doc=doc rol_destacado="visto" persona=persona %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if docs_recibidos %}
+    <div class="detail-section">
+      <div class="detail-section-title">
+        <i class="bi bi-inbox" style="color:var(--gold);"></i> Destinatario
+        <span class="doc-count">{{ docs_recibidos|length }}</span>
+      </div>
+      {% for doc in docs_recibidos %}
+        {% include "sonare_app/personas/_doc_card.html" with doc=doc rol_destacado="destinatario" persona=persona %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if docs_citado %}
+    <div class="detail-section">
+      <div class="detail-section-title">
+        <i class="bi bi-person-lines-fill" style="color:var(--gold);"></i> Citado/a
+        <span class="doc-count">{{ docs_citado|length }}</span>
+      </div>
+      {% for doc in docs_citado %}
+        {% include "sonare_app/personas/_doc_card.html" with doc=doc rol_destacado="citado" persona=persona %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Columna lateral: datos biográficos -->
+  <div class="col-12 col-md-4">
+    <div class="card-sonare" style="margin-bottom:1rem;">
+      <div class="detail-section-title">Datos biográficos</div>
+      <div class="detail-grid" style="grid-template-columns:110px 1fr;">
+        <span class="detail-key">ID</span>
+        <span class="detail-val" style="font-size:0.82rem; color:var(--text-muted);">{{ persona.id }}</span>
+
+        {% if persona.otras_formas_nombre %}
+          <span class="detail-key">Otras formas</span>
+          <span class="detail-val" style="font-size:0.85rem; font-style:italic;">{{ persona.otras_formas_nombre }}</span>
+        {% endif %}
+        {% if persona.genero %}
+          <span class="detail-key">Género</span>
+          <span class="detail-val">{{ persona.genero }}</span>
+        {% endif %}
+        {% if persona.fecha_nacimiento %}
+          <span class="detail-key">Nacimiento</span>
+          <span class="detail-val">{{ persona.fecha_nacimiento }}</span>
+        {% endif %}
+        {% if persona.fecha_muerte %}
+          <span class="detail-key">Fallecimiento</span>
+          <span class="detail-val">{{ persona.fecha_muerte }}</span>
+        {% endif %}
+
+        <span class="detail-key">Función</span>
+        <span class="detail-val">
+          {% if persona.funcion == "músico" %}
+            <span class="badge-sonare badge-green">{{ persona.funcion }}</span>
+          {% else %}
+            <span class="badge-sonare badge-muted">{{ persona.funcion }}</span>
+          {% endif %}
+        </span>
+
+        {% if persona.cargo_profesional %}
+          <span class="detail-key">Cargo</span>
+          <span class="detail-val">{{ persona.cargo_profesional }}</span>
+        {% endif %}
+        {% if persona.id_viaff %}
+          <span class="detail-key">VIAF</span>
+          <span class="detail-val" style="font-size:0.83rem;">{{ persona.id_viaff }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Resumen de actividad -->
+    <div class="card-sonare" style="margin-bottom:1rem;">
+      <div class="detail-section-title">Actividad documental</div>
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        {% if docs_emitidos %}
+        <div class="rol-stat">
+          <span><i class="bi bi-send" style="color:var(--gold); margin-right:0.3rem;"></i> Emisor</span>
+          <span class="rol-num">{{ docs_emitidos|length }}</span>
+        </div>
+        {% endif %}
+        {% if docs_visados %}
+        <div class="rol-stat">
+          <span><i class="bi bi-eye" style="color:var(--gold); margin-right:0.3rem;"></i> Supervisor</span>
+          <span class="rol-num">{{ docs_visados|length }}</span>
+        </div>
+        {% endif %}
+        {% if docs_recibidos %}
+        <div class="rol-stat">
+          <span><i class="bi bi-inbox" style="color:var(--gold); margin-right:0.3rem;"></i> Destinatario</span>
+          <span class="rol-num">{{ docs_recibidos|length }}</span>
+        </div>
+        {% endif %}
+        {% if docs_citado %}
+        <div class="rol-stat">
+          <span><i class="bi bi-person-lines-fill" style="color:var(--gold); margin-right:0.3rem;"></i> Citado/a</span>
+          <span class="rol-num">{{ docs_citado|length }}</span>
+        </div>
+        {% endif %}
+        <hr style="border:none; border-top:1px solid var(--border); margin:0.2rem 0;">
+        <div class="rol-stat">
+          <span style="font-weight:600;">Total</span>
+          <span class="rol-num" style="font-family:var(--serif); font-size:1.2rem; color:var(--navy);">
+            {{ docs_emitidos|length|add:docs_visados|length|add:docs_recibidos|length|add:docs_citado|length }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'sonare:persona_edit' persona.id %}" class="btn-gold">
+        <i class="bi bi-pencil"></i> Editar
+      </a>
+      {% endif %}
+      <a href="{% url 'sonare:persona_list' %}" class="btn-navy">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      window.location.href = row.dataset.href;
+    });
+  });
+</script>
+{% endblock %}

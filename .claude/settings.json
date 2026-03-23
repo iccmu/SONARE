@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/ivansimo/Documents/**)",
+      "Bash(python3 -c \"import openpyxl; print\\(''openpyxl OK''\\)\")",
+      "Bash(pip3 install openpyxl -q)",
+      "Bash(pip3 install openpyxl -q --break-system-packages)",
+      "Bash(python3 -c \"import openpyxl; print\\(''OK''\\)\")",
+      "Bash(python3 DATA/convertir_cereria.py)"
+    ]
+  }
+}

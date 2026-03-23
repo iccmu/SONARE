@@ -1,0 +1,224 @@
+{% extends "sonare_app/base.html" %}
+{% block title %}{{ doc.id }}{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb-sonare">
+  <a href="{% url 'sonare:home' %}">Inicio</a>
+  <span class="sep">/</span>
+  <a href="{% url 'sonare:documento_list' %}">Documentos</a>
+  <span class="sep">/</span>
+  <span>{{ doc.id }}</span>
+</div>
+
+<div class="row g-4">
+
+  <!-- Columna principal -->
+  <div class="col-12 col-md-8">
+
+    <div class="page-header">
+      <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+        <span class="badge-sonare badge-doc" style="font-size:0.78rem;">{{ doc.tipo_documento }}</span>
+        {% if doc.mencion_musica %}
+          <span class="badge-sonare badge-green"><i class="bi bi-music-note"></i> Mención musical</span>
+        {% endif %}
+        {% if doc.signatura %}
+          <span style="font-size:0.8rem; color:var(--text-muted);">
+            <i class="bi bi-archive"></i> {{ doc.signatura }}
+          </span>
+        {% endif %}
+      </div>
+      <h1 style="font-size:1.6rem;">{{ doc.id }}</h1>
+      {% if doc.fecha_documento %}
+        <p class="subtitle">{{ doc.fecha_documento }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Texto del documento -->
+    {% if doc.texto %}
+    <div class="detail-section">
+      <div class="detail-section-title">Texto del documento</div>
+      <div class="texto-doc">{{ doc.texto }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Práctica musical -->
+    {% if doc.practica_musical %}
+    <div class="detail-section">
+      <div class="detail-section-title">Práctica musical</div>
+      <p style="font-family:var(--serif); font-size:1rem; line-height:1.7;">{{ doc.practica_musical }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Datos del evento -->
+    {% if doc.evento_descripcion or doc.objeto_musical_desc %}
+    <div class="detail-section">
+      <div class="detail-section-title">Evento y objetos</div>
+      <div class="detail-grid">
+        {% if doc.evento_descripcion %}
+          <span class="detail-key">Descripción evento</span>
+          <span class="detail-val">{{ doc.evento_descripcion }}</span>
+        {% endif %}
+        {% if doc.objeto_musical_desc %}
+          <span class="detail-key">Objeto musical</span>
+          <span class="detail-val">{{ doc.objeto_musical_desc }}</span>
+        {% endif %}
+        {% if doc.autor %}
+          <span class="detail-key">Autor</span>
+          <span class="detail-val">{{ doc.autor }}</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Observaciones -->
+    {% if doc.observaciones %}
+    <div class="detail-section">
+      <div class="detail-section-title">Observaciones</div>
+      <p style="font-size:0.9rem; color:var(--text-muted); line-height:1.7;">{{ doc.observaciones }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Luces (datos Cerería) -->
+    {% if doc.luces or doc.hora or doc.metadata %}
+    <div class="detail-section">
+      <div class="detail-section-title">Datos de iluminación <span style="font-weight:400; color:var(--text-muted);">(Real Cerería)</span></div>
+      <div class="detail-grid">
+        {% if doc.hora %}
+          <span class="detail-key">Hora</span>
+          <span class="detail-val">{{ doc.hora }}</span>
+        {% endif %}
+        {% if doc.luces %}
+          <span class="detail-key">Luces</span>
+          <span class="detail-val">{{ doc.luces }}</span>
+        {% endif %}
+        {% if doc.metadata.numero_total %}
+          <span class="detail-key">N.º total velas</span>
+          <span class="detail-val">{{ doc.metadata.numero_total }}</span>
+        {% endif %}
+        {% if doc.metadata.numero_musica %}
+          <span class="detail-key">N.º para música</span>
+          <span class="detail-val">{{ doc.metadata.numero_musica }}</span>
+        {% endif %}
+        {% if doc.metadata.carpeta_fotos %}
+          <span class="detail-key">Carpeta fotos</span>
+          <span class="detail-val">{{ doc.metadata.carpeta_fotos }}</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Personas citadas -->
+    {% if otras_personas %}
+    <div class="detail-section">
+      <div class="detail-section-title">Personas citadas</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+        {% for p in otras_personas %}
+          <a href="{% url 'sonare:persona_detail' p.id %}" class="badge-sonare badge-muted" style="text-decoration:none;">
+            {{ p }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Columna lateral — metadatos -->
+  <div class="col-12 col-md-4">
+
+    <!-- Fechas y lugar -->
+    <div class="card-sonare" style="margin-bottom:1rem;">
+      <div class="detail-section-title">Localización y fechas</div>
+      <div class="detail-grid" style="grid-template-columns:100px 1fr;">
+        {% if doc.fecha_documento %}
+          <span class="detail-key">Fecha doc.</span>
+          <span class="detail-val">{{ doc.fecha_documento }}</span>
+        {% endif %}
+        {% if doc.fecha_inicio %}
+          <span class="detail-key">Fecha inicio</span>
+          <span class="detail-val">{{ doc.fecha_inicio }}</span>
+        {% endif %}
+        {% if doc.fecha_fin %}
+          <span class="detail-key">Fecha fin</span>
+          <span class="detail-val">{{ doc.fecha_fin }}</span>
+        {% endif %}
+        {% if doc.lugar_documento %}
+          <span class="detail-key">Lugar doc.</span>
+          <span class="detail-val">{{ doc.lugar_documento }}</span>
+        {% endif %}
+        {% if doc.lugar %}
+          <span class="detail-key">Lugar</span>
+          <span class="detail-val" style="font-size:0.85rem;">{{ doc.lugar }}</span>
+        {% endif %}
+        {% if doc.observaciones_lugar %}
+          <span class="detail-key">Detalle lugar</span>
+          <span class="detail-val" style="font-size:0.85rem; color:var(--text-muted);">{{ doc.observaciones_lugar }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Personas -->
+    <div class="card-sonare" style="margin-bottom:1rem;">
+      <div class="detail-section-title">Personas involucradas</div>
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        {% if doc.emisor %}
+        <div>
+          <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.2rem;">Emisor</div>
+          <a href="{% url 'sonare:persona_detail' doc.emisor.id %}" style="font-size:0.9rem; font-weight:500;">{{ doc.emisor }}</a>
+        </div>
+        {% endif %}
+        {% if doc.visto %}
+        <div>
+          <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.2rem;">Visto</div>
+          <a href="{% url 'sonare:persona_detail' doc.visto.id %}" style="font-size:0.9rem;">{{ doc.visto }}</a>
+        </div>
+        {% endif %}
+        {% if doc.destinatario %}
+        <div>
+          <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.2rem;">Destinatario</div>
+          <a href="{% url 'sonare:persona_detail' doc.destinatario.id %}" style="font-size:0.9rem;">{{ doc.destinatario }}</a>
+        </div>
+        {% endif %}
+        {% if not doc.emisor and not doc.visto and not doc.destinatario %}
+          <span style="font-size:0.85rem; color:var(--text-muted); font-style:italic;">Sin personas registradas</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Sección administrativa -->
+    {% if doc.seccion_administrativa_emision or doc.seccion_administrativa_recepcion %}
+    <div class="card-sonare" style="margin-bottom:1rem;">
+      <div class="detail-section-title">Sección administrativa</div>
+      <div class="detail-grid" style="grid-template-columns:90px 1fr;">
+        {% if doc.seccion_administrativa_emision %}
+          <span class="detail-key">Emisión</span>
+          <span class="detail-val" style="font-size:0.85rem;">{{ doc.seccion_administrativa_emision }}</span>
+        {% endif %}
+        {% if doc.seccion_administrativa_recepcion %}
+          <span class="detail-key">Recepción</span>
+          <span class="detail-val" style="font-size:0.85rem;">{{ doc.seccion_administrativa_recepcion }}</span>
+        {% else %}
+          <span class="detail-key">Recepción</span>
+          <span class="detail-val empty">Sin registrar</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Acciones -->
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'sonare:documento_edit' doc.id %}" class="btn-gold">
+        <i class="bi bi-pencil"></i> Editar
+      </a>
+      {% endif %}
+      <a href="{% url 'sonare:documento_list' %}" class="btn-navy">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

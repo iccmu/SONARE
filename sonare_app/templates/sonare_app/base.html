@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SONARE{% endblock %} — Archivo Musical de la Corte</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    /* ── Sistema de diseño ─────────────────────────────────────────── */
+    :root {
+      --parchment:    #f5f0e8;
+      --parchment-dk: #ede6d6;
+      --navy:         #1a2332;
+      --navy-lt:      #253347;
+      --gold:         #c49a3c;
+      --gold-lt:      #e8c96a;
+      --text:         #2c2c2c;
+      --text-muted:   #6b6b6b;
+      --border:       #d6cdb8;
+      --white:        #ffffff;
+      --serif:        'Crimson Pro', Georgia, serif;
+      --sans:         'Inter', system-ui, sans-serif;
+    }
+
+    /* ── Base ──────────────────────────────────────────────────────── */
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--parchment);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5 {
+      font-family: var(--serif);
+      font-weight: 600;
+    }
+
+    a { color: var(--navy); text-decoration: none; }
+    a:hover { color: var(--gold); }
+
+    /* ── Navbar ────────────────────────────────────────────────────── */
+    .sonare-nav {
+      background: var(--navy);
+      border-bottom: 3px solid var(--gold);
+      padding: 0;
+    }
+
+    .sonare-nav .nav-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      padding: 0.9rem 1.5rem;
+      text-decoration: none;
+    }
+
+    .sonare-nav .brand-title {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+
+    .sonare-nav .brand-sub {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      color: var(--gold-lt);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .sonare-nav .nav-links {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sonare-nav .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0 1.2rem;
+      height: 100%;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -3px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .sonare-nav .nav-links a:hover,
+    .sonare-nav .nav-links a.active {
+      color: var(--white);
+      border-bottom-color: var(--gold);
+    }
+
+    .sonare-nav .nav-links i { font-size: 0.9rem; }
+
+    /* ── Layout principal ──────────────────────────────────────────── */
+    .page-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Page header ───────────────────────────────────────────────── */
+    .page-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      color: var(--navy);
+      margin: 0 0 0.25rem;
+    }
+
+    .page-header .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-family: var(--sans);
+    }
+
+    /* ── Cards ─────────────────────────────────────────────────────── */
+    .card-sonare {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+    }
+
+    .card-sonare + .card-sonare { margin-top: 1rem; }
+
+    /* ── Stat pill ─────────────────────────────────────────────────── */
+    .stat-pill {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+    }
+
+    .stat-pill .stat-num {
+      font-family: var(--serif);
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .stat-pill .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+    }
+
+    /* ── Tabla de datos ────────────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      font-size: 0.88rem;
+    }
+
+    .data-table thead tr {
+      background: var(--navy);
+    }
+
+    .data-table thead th {
+      color: rgba(255,255,255,0.85);
+      font-family: var(--sans);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.75rem 1rem;
+      border: none;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .data-table tbody tr {
+      border-bottom: 1px solid var(--parchment-dk);
+      transition: background 0.15s;
+    }
+
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--parchment); }
+    .data-table tbody tr.clickable-row:hover { background: #e8e0d0; }
+
+    .data-table td {
+      padding: 0.7rem 1rem;
+      vertical-align: middle;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 0;  /* necesario para que text-overflow funcione con table-layout:fixed */
+    }
+
+    .data-table td.id-col {
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      width: 80px;
+    }
+
+    /* ── Doc cards (perfil persona) ────────────────────────────────── */
+    .doc-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      padding: 0.85rem 1rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      margin-bottom: 0.6rem;
+      cursor: pointer;
+    }
+    .doc-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    /* Enlace a campo editable dentro de tarjeta */
+    .doc-field-link {
+      text-decoration: none;
+      color: inherit;
+      border-radius: 3px;
+      transition: background 0.15s, color 0.15s, outline 0.15s;
+      position: relative;
+    }
+    .doc-field-link:hover {
+      background: rgba(180,145,60,0.13);
+      color: var(--navy);
+      outline: 1.5px solid var(--gold);
+      text-decoration: none;
+    }
+    .doc-field-link:hover::after {
+      content: "✎";
+      font-size: 0.7rem;
+      margin-left: 0.3rem;
+      opacity: 0.7;
+      color: var(--gold);
+    }
+    .doc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.6rem;
+    }
+    .doc-card-id {
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+    .doc-card-meta {
+      display: flex;
+      gap: 0.9rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--sans);
+      flex-wrap: wrap;
+    }
+    .doc-card-meta i { margin-right: 0.2rem; }
+    .doc-card-roles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .doc-role {
+      display: flex;
+      flex-direction: column;
+      background: var(--parchment);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      min-width: 110px;
+    }
+    .doc-role--active {
+      background: rgba(180,145,60,0.12);
+      border-color: var(--gold);
+    }
+    .doc-role-label {
+      font-size: 0.67rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      font-family: var(--sans);
+      font-weight: 500;
+    }
+    .doc-role--active .doc-role-label { color: var(--gold); }
+    .doc-role-persona {
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .doc-role--active .doc-role-persona { color: var(--navy); font-weight: 700; }
+    .doc-card-practica {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 0.4rem;
+      line-height: 1.5;
+    }
+    .doc-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold);
+      color: var(--white);
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-family: var(--sans);
+      font-weight: 600;
+      padding: 0 0.45rem;
+      min-width: 1.4rem;
+      height: 1.4rem;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+    .doc-card-vacios {
+      margin-top: 0.6rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .campo-vacio {
+      font-size: 0.72rem;
+      font-family: var(--sans);
+      background: #fdf3f3;
+      color: #b94040;
+      border: 1px solid #f0c0c0;
+      border-radius: 3px;
+      padding: 0.1rem 0.45rem;
+    }
+
+    .rol-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    .rol-num {
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    /* ── Badges ────────────────────────────────────────────────────── */
+    .badge-sonare {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .badge-doc    { background: #eef0f8; color: #2d3a6e; border: 1px solid #c5cae8; }
+    .badge-gold   { background: #fdf5e0; color: #7a5c10; border: 1px solid #e8d494; }
+    .badge-green  { background: #edf7f0; color: #1e5c35; border: 1px solid #a8d8b4; }
+    .badge-muted  { background: #f0f0f0; color: #555;    border: 1px solid #ddd; }
+    .badge-red    { background: #fdecea; color: #8b1a1a; border: 1px solid #e8b4b4; }
+
+    /* ── Filtro lateral ────────────────────────────────────────────── */
+    .filter-panel {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.25rem;
+      position: sticky;
+      top: 1.5rem;
+    }
+
+    .filter-panel .filter-title {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-group { margin-bottom: 1rem; }
+
+    .filter-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      width: 100%;
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      background: var(--parchment);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: var(--white);
+    }
+
+    .btn-filter {
+      width: 100%;
+      padding: 0.5rem;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 3px;
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-filter:hover { background: var(--navy-lt); }
+
+    .btn-clear {
+      width: 100%;
+      padding: 0.4rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover { border-color: var(--text-muted); color: var(--text); }
+
+    /* ── Botón acción ──────────────────────────────────────────────── */
+    .btn-gold {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.9rem;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-gold:hover { background: var(--gold-lt); color: var(--navy); }
+
+    .btn-navy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.9rem;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-navy:hover { background: var(--navy-lt); color: var(--white); }
+
+    /* ── Ficha de detalle ──────────────────────────────────────────── */
+    .detail-section {
+      margin-bottom: 2rem;
+    }
+
+    .detail-section-title {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--parchment-dk);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0.5rem 1.5rem;
+    }
+
+    .detail-key {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding-top: 0.1rem;
+    }
+
+    .detail-val {
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .detail-val.empty { color: var(--text-muted); font-style: italic; }
+
+    .texto-doc {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--parchment);
+      border-left: 3px solid var(--gold);
+      padding: 1rem 1.25rem;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* ── Breadcrumb ────────────────────────────────────────────────── */
+    .breadcrumb-sonare {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .breadcrumb-sonare a { color: var(--text-muted); }
+    .breadcrumb-sonare a:hover { color: var(--gold); }
+    .breadcrumb-sonare .sep { color: var(--border); }
+
+    /* ── Paginación ────────────────────────────────────────────────── */
+    .pagination-sonare {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 1.5rem;
+    }
+
+    .pagination-sonare a,
+    .pagination-sonare span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 0.85rem;
+      background: var(--white);
+      color: var(--text);
+      transition: all 0.15s;
+    }
+
+    .pagination-sonare a:hover { background: var(--parchment-dk); border-color: var(--gold); }
+    .pagination-sonare span.current {
+      background: var(--navy);
+      color: var(--white);
+      border-color: var(--navy);
+      font-weight: 600;
+    }
+    .pagination-sonare span.disabled { opacity: 0.4; pointer-events: none; }
+
+    /* ── Conteo resultados ─────────────────────────────────────────── */
+    .results-count {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .results-count strong { color: var(--navy); }
+
+    /* ── Columnas ordenables ───────────────────────────────────────── */
+    .sortable-th {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .sortable-th:hover { color: var(--gold-lt); }
+    .sort-icon {
+      display: inline-block;
+      margin-left: 0.3em;
+      opacity: 0.4;
+      font-size: 0.7em;
+    }
+    .sortable-th.sort-active .sort-icon { opacity: 1; color: var(--gold); }
+
+    /* ── Highlight búsqueda ────────────────────────────────────────── */
+    mark {
+      background: #fff0b3;
+      color: var(--text);
+      border-radius: 2px;
+      padding: 0 2px;
+      font-style: inherit;
+      font-weight: inherit;
+    }
+
+    /* ── Responsive ────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page-wrapper { padding: 1rem; }
+      .filter-panel { position: static; }
+      .detail-grid { grid-template-columns: 1fr; gap: 0.25rem; }
+      .detail-key { color: var(--gold); font-size: 0.75rem; }
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="sonare-nav d-flex align-items-stretch justify-content-between">
+  <a href="{% url 'sonare:home' %}" class="nav-brand">
+    <span class="brand-title">SONARE</span>
+    <span class="brand-sub">Archivo Musical</span>
+  </a>
+  <ul class="nav-links">
+    <li>
+      <a href="{% url 'sonare:documento_list' %}" class="{% if request.resolver_match.url_name == 'documento_list' or request.resolver_match.url_name == 'documento_detail' %}active{% endif %}">
+        <i class="bi bi-file-text"></i> Documentos
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'sonare:persona_list' %}" class="{% if request.resolver_match.url_name == 'persona_list' or request.resolver_match.url_name == 'persona_detail' %}active{% endif %}">
+        <i class="bi bi-people"></i> Personas
+      </a>
+    </li>
+    {% if request.user.is_authenticated %}
+    <li>
+      <form method="post" action="/logout/" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" style="background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.6); font-size:0.82rem; font-family:var(--sans); padding:0 1rem; height:100%; display:flex; align-items:center; gap:0.4rem;">
+          <i class="bi bi-person-check"></i> {{ request.user.username }} &nbsp;·&nbsp; Salir
+        </button>
+      </form>
+    </li>
+    {% else %}
+    <li>
+      <a href="/login/?next={{ request.path }}">
+        <i class="bi bi-box-arrow-in-right"></i> Entrar
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+
+<!-- Contenido -->
+<div class="page-wrapper">
+  {% block content %}{% endblock %}
+</div>
+
+<!-- Footer -->
+<footer style="background:var(--navy); color:rgba(255,255,255,0.45); text-align:center; padding:1rem; font-size:0.75rem; margin-top:4rem;">
+  SONARE &mdash; Archivo Musical de la Corte &mdash; Siglo XVIII
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

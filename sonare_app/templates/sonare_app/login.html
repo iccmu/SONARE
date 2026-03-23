@@ -1,0 +1,38 @@
+{% extends "sonare_app/base.html" %}
+{% block title %}Acceso{% endblock %}
+
+{% block content %}
+<div style="max-width:400px; margin:4rem auto;">
+  <div class="card-sonare">
+    <div style="text-align:center; margin-bottom:1.5rem;">
+      <i class="bi bi-shield-lock" style="font-size:2rem; color:var(--gold);"></i>
+      <h2 style="font-size:1.4rem; margin-top:0.5rem;">Acceso restringido</h2>
+      <p style="font-size:0.85rem; color:var(--text-muted);">Introduce tus credenciales para editar los registros</p>
+    </div>
+
+    {% if form.errors %}
+    <div style="background:#fdf0f0; border-left:3px solid #c0392b; padding:0.75rem 1rem; border-radius:4px; margin-bottom:1rem; font-size:0.85rem; color:#c0392b;">
+      Usuario o contraseña incorrectos.
+    </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="edit-field" style="margin-bottom:1rem;">
+        <label style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:500;">Usuario</label>
+        <input type="text" name="username" autofocus autocomplete="username"
+               style="border:1px solid var(--border); border-radius:4px; padding:0.5rem 0.75rem; font-size:0.9rem; font-family:var(--sans); width:100%; box-sizing:border-box;">
+      </div>
+      <div class="edit-field" style="margin-bottom:1.5rem;">
+        <label style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:500;">Contraseña</label>
+        <input type="password" name="password" autocomplete="current-password"
+               style="border:1px solid var(--border); border-radius:4px; padding:0.5rem 0.75rem; font-size:0.9rem; font-family:var(--sans); width:100%; box-sizing:border-box;">
+      </div>
+      <button type="submit" class="btn-gold" style="width:100%; justify-content:center;">
+        <i class="bi bi-box-arrow-in-right"></i> Entrar
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

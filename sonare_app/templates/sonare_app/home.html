@@ -1,0 +1,98 @@
+{% extends "sonare_app/base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div style="text-align:center; padding: 3rem 1rem 2.5rem;">
+  <p style="font-family:var(--sans); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.15em; color:var(--gold); margin-bottom:0.75rem;">
+    Real Cerería — Siglo XVIII
+  </p>
+  <h1 style="font-size:2.8rem; color:var(--navy); margin-bottom:0.75rem;">
+    Archivo Musical de la Corte
+  </h1>
+  <p style="color:var(--text-muted); max-width:560px; margin:0 auto; line-height:1.7; font-size:0.95rem;">
+    Base de datos de documentos históricos sobre la práctica musical en la corte española.
+    Fondos procedentes de la Real Cerería, siglo XVIII.
+  </p>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4" style="max-width:700px; margin:0 auto 2.5rem;">
+  <div class="col-4">
+    <div class="stat-pill">
+      <div class="stat-num">{{ total_documentos }}</div>
+      <div class="stat-label">Documentos</div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="stat-pill">
+      <div class="stat-num">{{ total_personas }}</div>
+      <div class="stat-label">Personas</div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="stat-pill">
+      <div class="stat-num">{{ docs_con_musica }}</div>
+      <div class="stat-label">Con mención musical</div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:700px; margin:0 auto; display:flex; gap:0.75rem; justify-content:center; margin-bottom:3rem;">
+  <a href="{% url 'sonare:documento_list' %}" class="btn-gold">
+    <i class="bi bi-file-text"></i> Explorar documentos
+  </a>
+  <a href="{% url 'sonare:persona_list' %}" class="btn-navy">
+    <i class="bi bi-people"></i> Ver personas
+  </a>
+</div>
+
+<!-- Divisor -->
+<hr style="border:none; border-top:1px solid var(--border); margin-bottom:2rem;">
+
+<!-- Dos columnas de tarjetas -->
+<div class="row g-4">
+
+  <!-- Columna izquierda: registros completos -->
+  <div class="col-12 col-md-6">
+    <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.1rem;">
+      <h2 style="font-size:1.1rem; color:var(--navy); margin:0;">Registros completos</h2>
+      <span style="font-size:0.78rem; color:var(--text-muted); font-family:var(--sans);">muestra aleatoria</span>
+    </div>
+
+    {% for doc in docs_completos %}
+      {% include "sonare_app/personas/_doc_card.html" with doc=doc rol_destacado="" persona=None %}
+    {% empty %}
+      <p style="color:var(--text-muted); font-style:italic; font-size:0.9rem;">No hay registros completos.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Columna derecha: registros incompletos -->
+  <div class="col-12 col-md-6">
+    <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.1rem;">
+      <h2 style="font-size:1.1rem; color:var(--navy); margin:0;">Pendientes de completar</h2>
+      <span style="font-size:0.78rem; color:var(--text-muted); font-family:var(--sans);">muestra aleatoria</span>
+    </div>
+
+    {% for doc in docs_incompletos %}
+      {% include "sonare_app/personas/_doc_card.html" with doc=doc rol_destacado="" persona=None mostrar_vacios=True %}
+    {% empty %}
+      <p style="color:var(--text-muted); font-style:italic; font-size:0.9rem;">No hay registros incompletos.</p>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      window.location.href = row.dataset.href;
+    });
+  });
+</script>
+{% endblock %}

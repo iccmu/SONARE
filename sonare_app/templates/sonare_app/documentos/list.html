@@ -1,0 +1,274 @@
+{% extends "sonare_app/base.html" %}
+{% block title %}Documentos{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-file-text" style="font-size:1.6rem; color:var(--gold);"></i> Documentos</h1>
+  <span class="subtitle">Archivo de la Real Cerería — {{ paginator.count }} registros</span>
+</div>
+
+<div class="row g-4">
+
+  <!-- Panel de filtros -->
+  <div class="col-12 col-md-3">
+    <div class="filter-panel">
+      <div class="filter-title"><i class="bi bi-funnel"></i> Filtros</div>
+
+      <form method="get" id="filter-form">
+        <div class="filter-group">
+          <label>Búsqueda</label>
+          <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Signatura, texto, lugar…" id="filter-q">
+        </div>
+
+        <div class="filter-group">
+          <label>Tipo de documento</label>
+          <select name="tipo" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for t in tipos %}
+              <option value="{{ t }}" {% if request.GET.tipo == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Mención musical</label>
+          <select name="musica" onchange="this.form.submit()">
+            <option value="">Todas</option>
+            <option value="1" {% if request.GET.musica == "1" %}selected{% endif %}>Sí</option>
+            <option value="0" {% if request.GET.musica == "0" %}selected{% endif %}>No</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Emisor</label>
+          <select name="emisor" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for p in personas_con_docs %}
+              <option value="{{ p.id }}" {% if request.GET.emisor == p.id %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Sitio real</label>
+          <select name="sitio" id="filter-sitio" onchange="actualizarDependencias(); this.form.submit()">
+            <option value="">Todos</option>
+            {% for sitio in sitios %}
+              <option value="{{ sitio.id }}" {% if request.GET.sitio == sitio.id|stringformat:"s" %}selected{% endif %}>
+                {{ sitio.nombre }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Dependencia</label>
+          <select name="dependencia" id="filter-dependencia" onchange="this.form.submit()">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Fecha desde</label>
+          <input type="text" name="desde" value="{{ request.GET.desde }}" placeholder="1795-01-01" id="filter-desde">
+        </div>
+
+        <div class="filter-group">
+          <label>Fecha hasta</label>
+          <input type="text" name="hasta" value="{{ request.GET.hasta }}" placeholder="1800-12-31" id="filter-hasta">
+        </div>
+
+        <a href="{% url 'sonare:documento_list' %}">
+          <button type="button" class="btn-clear">Limpiar filtros</button>
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="col-12 col-md-9">
+    <div class="results-count">
+      <strong>{{ paginator.count }}</strong> documentos
+      {% if request.GET.q or request.GET.tipo or request.GET.musica or request.GET.emisor %}
+        — filtrado activo
+      {% endif %}
+    </div>
+
+    <div class="card-sonare" style="padding:0; overflow:hidden;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="sortable-th {% if sort == 'id' %}sort-active{% endif %}" data-sort="id" style="width:90px;">ID <span class="sort-icon">{% if sort == 'id' %}{% if dir == 'asc' %}▲{% else %}▼{% endif %}{% else %}⇅{% endif %}</span></th>
+            <th class="sortable-th {% if sort == 'tipo' %}sort-active{% endif %}" data-sort="tipo" style="width:22%;">Tipo <span class="sort-icon">{% if sort == 'tipo' %}{% if dir == 'asc' %}▲{% else %}▼{% endif %}{% else %}⇅{% endif %}</span></th>
+            <th class="sortable-th {% if sort == 'fecha' %}sort-active{% endif %}" data-sort="fecha" style="width:110px;">Fecha <span class="sort-icon">{% if sort == 'fecha' %}{% if dir == 'asc' %}▲{% else %}▼{% endif %}{% else %}⇅{% endif %}</span></th>
+            <th class="sortable-th {% if sort == 'lugar' %}sort-active{% endif %}" data-sort="lugar" style="width:16%;">Lugar <span class="sort-icon">{% if sort == 'lugar' %}{% if dir == 'asc' %}▲{% else %}▼{% endif %}{% else %}⇅{% endif %}</span></th>
+            <th class="sortable-th {% if sort == 'emisor' %}sort-active{% endif %}" data-sort="emisor" style="width:16%;">Emisor <span class="sort-icon">{% if sort == 'emisor' %}{% if dir == 'asc' %}▲{% else %}▼{% endif %}{% else %}⇅{% endif %}</span></th>
+            <th class="sortable-th {% if sort == 'practica' %}sort-active{% endif %}" data-sort="practica">Práctica musical <span class="sort-icon">{% if sort == 'practica' %}{% if dir == 'asc' %}▲{% else %}▼{% endif %}{% else %}⇅{% endif %}</span></th>
+            <th class="sortable-th {% if sort == 'musica' %}sort-active{% endif %}" data-sort="musica" style="width:70px;">Música <span class="sort-icon">{% if sort == 'musica' %}{% if dir == 'asc' %}▲{% else %}▼{% endif %}{% else %}⇅{% endif %}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doc in page_obj %}
+          <tr class="clickable-row" data-href="{% url 'sonare:documento_detail' doc.id %}" style="cursor:pointer;">
+            <td class="id-col">
+              <a href="{% url 'sonare:documento_detail' doc.id %}">{{ doc.id }}</a>
+            </td>
+            <td title="{{ doc.tipo_documento }}">
+              <span class="badge-sonare badge-doc" style="font-size:0.73rem;">
+                {{ doc.tipo_documento|truncatechars:35 }}
+              </span>
+            </td>
+            <td style="font-size:0.85rem; color:var(--text-muted);">
+              {{ doc.fecha_documento|default:"—" }}
+            </td>
+            <td style="font-size:0.85rem; color:var(--text-muted);" title="{% if doc.lugar_ref %}{% if doc.lugar_ref.padre %}{{ doc.lugar_ref.padre.nombre }} › {% endif %}{{ doc.lugar_ref.nombre }}{% else %}{{ doc.lugar_documento }}{% endif %}">
+              {% if doc.lugar_ref %}
+                {% if doc.lugar_ref.padre %}<span style="opacity:0.6;">{{ doc.lugar_ref.padre.nombre }} ›</span> {% endif %}{{ doc.lugar_ref.nombre }}
+              {% else %}
+                {{ doc.lugar_documento|default:"—" }}
+              {% endif %}
+            </td>
+            <td style="font-size:0.85rem;" title="{% if doc.emisor %}{{ doc.emisor }}{% endif %}">
+              {% if doc.emisor %}
+                <a href="{% url 'sonare:persona_detail' doc.emisor.id %}">{{ doc.emisor }}</a>
+              {% else %}—{% endif %}
+            </td>
+            <td style="font-size:0.83rem; color:var(--text-muted);" title="{{ doc.practica_musical }}">
+              {% if doc.practica_musical and doc.practica_musical != 'None' %}{{ doc.practica_musical|truncatechars:60 }}{% else %}—{% endif %}
+            </td>
+            <td style="text-align:center;">
+              {% if doc.mencion_musica %}
+                <span class="badge-sonare badge-green" title="Mención musical"><i class="bi bi-music-note"></i></span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted); font-style:italic;">
+              No se encontraron documentos con los filtros seleccionados.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-sonare">
+      {% if page_obj.has_previous %}
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}" title="Anterior">
+          <i class="bi bi-chevron-left"></i>
+        </a>
+      {% else %}
+        <span class="disabled"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="current">{{ num }}</span>
+        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+          <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}" title="Siguiente">
+          <i class="bi bi-chevron-right"></i>
+        </a>
+      {% else %}
+        <span class="disabled"><i class="bi bi-chevron-right"></i></span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // ── Lugares en cascada ────────────────────────────────────────────
+  const LUGARES = {{ lugares_json|safe }};
+  const selSitio = document.getElementById('filter-sitio');
+  const selDep   = document.getElementById('filter-dependencia');
+  const SITIO_ACTIVO = "{{ request.GET.sitio }}";
+  const DEP_ACTIVA   = "{{ request.GET.dependencia }}";
+
+  function actualizarDependencias() {
+    const padreId = parseInt(selSitio.value) || null;
+    const hijos = LUGARES.filter(l => l.padre_id === padreId);
+    selDep.innerHTML = '<option value="">Todas</option>';
+    hijos.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.nombre;
+      if (String(l.id) === DEP_ACTIVA) opt.selected = true;
+      selDep.appendChild(opt);
+    });
+    selDep.disabled = hijos.length === 0;
+  }
+
+  // Inicializar al cargar con los valores activos de la URL
+  if (SITIO_ACTIVO) actualizarDependencias();
+
+  // ── Auto-submit con debounce
+  function debounce(fn, delay) {
+    let t;
+    return function(...args) { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+  }
+  const form = document.getElementById('filter-form');
+  ['filter-q', 'filter-desde', 'filter-hasta'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', debounce(() => {
+      sessionStorage.setItem('focusField', id);
+      form.submit();
+    }, 500));
+  });
+
+  // Restaurar foco al campo que disparó el submit
+  const lastFocus = sessionStorage.getItem('focusField');
+  if (lastFocus) {
+    sessionStorage.removeItem('focusField');
+    const el = document.getElementById(lastFocus);
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
+
+  // ── Filas clickables ─────────────────────────────────────────────────
+  document.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', e => {
+      // No navegar si el click fue en un enlace interno (emisor, etc.)
+      if (e.target.closest('a')) return;
+      window.location.href = row.dataset.href;
+    });
+  });
+
+  // ── Ordenación por columna ────────────────────────────────────────────
+  document.querySelectorAll('.sortable-th').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      const params = new URLSearchParams(window.location.search);
+      const curSort = params.get('sort');
+      const curDir  = params.get('dir') || 'asc';
+      params.set('sort', col);
+      params.set('dir', curSort === col && curDir === 'asc' ? 'desc' : 'asc');
+      params.delete('page');
+      window.location.search = params.toString();
+    });
+  });
+
+  // Highlight del término buscado en la tabla
+  {% if q %}
+  (function() {
+    const term = "{{ q|escapejs }}".toLowerCase();
+    if (!term) return;
+    const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    document.querySelectorAll('.data-table tbody td').forEach(td => {
+      td.innerHTML = td.innerHTML.replace(re, m => `<mark>${m}</mark>`);
+    });
+  })();
+  {% endif %}
+</script>
+{% endblock %}
